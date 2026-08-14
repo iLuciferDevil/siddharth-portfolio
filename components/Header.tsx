@@ -1,0 +1,2 @@
+import Link from 'next/link';
+export default function Header(){return <header className="container nav"><Link href="/" className="logo">SIDDHARTH<span style={{fontWeight:400}}>.</span></Link><nav className="navlinks"><a href="/#work">Work</a><Link href="/services">Services</Link><Link href="/blog">Writing</Link><a href="/#about">About</a></nav><a className="pill" href="/#contact">Let&apos;s talk ↗</a></header>}
