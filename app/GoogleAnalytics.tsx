@@ -48,7 +48,8 @@ export default function GoogleAnalytics() {
               var newEmail = 'email@siddharthbhattacharjee.in';
               document.querySelectorAll('a[href^="mailto:"]').forEach(function (link) {
                 if (link.getAttribute('href') === 'mailto:' + oldEmail) link.setAttribute('href', 'mailto:' + newEmail);
-                if ((link.textContent || '').includes(oldEmail)) link.textContent = link.textContent.replace(oldEmail, newEmail);
+                var small = link.querySelector('small');
+                if (small && small.textContent.includes(oldEmail)) small.textContent = small.textContent.replace(oldEmail, newEmail);
               });
               document.querySelectorAll('form[action*="formsubmit.co"]').forEach(function (form) {
                 var action = form.getAttribute('action') || '';
