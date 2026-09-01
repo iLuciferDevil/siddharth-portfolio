@@ -43,6 +43,20 @@ export default function GoogleAnalytics() {
               var form = event.target;
               if (form && form.tagName === 'FORM') track('contact_form_submit');
             }, true);
+            function updateContactEmail() {
+              var oldEmail = 'contactsiddb.01@gmail.com';
+              var newEmail = 'email@siddharthbhattacharjee.in';
+              document.querySelectorAll('a[href^="mailto:"]').forEach(function (link) {
+                if (link.getAttribute('href') === 'mailto:' + oldEmail) link.setAttribute('href', 'mailto:' + newEmail);
+                if ((link.textContent || '').includes(oldEmail)) link.textContent = link.textContent.replace(oldEmail, newEmail);
+              });
+              document.querySelectorAll('form[action*="formsubmit.co"]').forEach(function (form) {
+                var action = form.getAttribute('action') || '';
+                if (action.includes(oldEmail)) form.setAttribute('action', action.replace(oldEmail, newEmail));
+              });
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', updateContactEmail);
+            else updateContactEmail();
           })();
         `}
       </Script>
