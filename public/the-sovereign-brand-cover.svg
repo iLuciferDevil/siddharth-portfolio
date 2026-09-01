@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 848 1264">
+<rect width="848" height="1264" fill="#111c31"/>
+<circle cx="424" cy="430" r="330" fill="#17243a" stroke="#d3a532" stroke-width="2" opacity=".95"/>
+<g fill="none" stroke="#5c6b7f" stroke-width="1" opacity=".6">
+<path d="M95 240L205 135L424 185L642 135L752 240L700 520L560 610L424 575L288 610L148 520Z"/>
+<path d="M95 240L424 575L752 240M205 135L288 610M642 135L560 610M148 520L700 520"/>
+<path d="M250 860L424 760L598 860L520 960L328 960Z"/>
+<path d="M250 860L328 960M598 860L520 960M424 760L424 1000"/>
+</g>
+<g fill="#d3a532">
+<circle cx="95" cy="240" r="4"/><circle cx="205" cy="135" r="4"/><circle cx="424" cy="185" r="4"/><circle cx="642" cy="135" r="4"/><circle cx="752" cy="240" r="4"/><circle cx="700" cy="520" r="4"/><circle cx="560" cy="610" r="4"/><circle cx="288" cy="610" r="4"/><circle cx="148" cy="520" r="4"/><circle cx="250" cy="860" r="4"/><circle cx="598" cy="860" r="4"/><circle cx="424" cy="760" r="4"/>
+</g>
+<text x="424" y="78" text-anchor="middle" fill="#d3a532" font-family="Arial, sans-serif" font-size="20" letter-spacing="7">SIDDHARTH BHATTACHARJEE</text>
+<text x="424" y="108" text-anchor="middle" fill="#aeb7c4" font-family="Arial, sans-serif" font-size="12" letter-spacing="3">Former Amazon · Brand Strategist · AI Marketing Architect</text>
+<text x="424" y="310" text-anchor="middle" fill="#f5efe2" font-family="Arial, sans-serif" font-size="42" letter-spacing="16">THE</text>
+<text x="424" y="405" text-anchor="middle" fill="#d3a532" font-family="Arial, sans-serif" font-weight="700" font-size="92" letter-spacing="3">SOVEREIGN</text>
+<text x="424" y="500" text-anchor="middle" fill="#f5efe2" font-family="Arial, sans-serif" font-weight="700" font-size="92" letter-spacing="10">BRAND</text>
+<line x1="230" y1="548" x2="618" y2="548" stroke="#d3a532" stroke-width="2"/>
+<text x="424" y="590" text-anchor="middle" fill="#b8a66f" font-family="Georgia, serif" font-size="19" font-style="italic">The AI Marketing Playbook for the Ambitious Professional</text>
+<line x1="210" y1="1170" x2="638" y2="1170" stroke="#d3a532" stroke-width="2"/>
+<text x="424" y="1200" text-anchor="middle" fill="#d3a532" font-family="Arial, sans-serif" font-size="14" letter-spacing="6">VOLUME I · THE AGENTIC REVOLUTION</text>
+</svg>
