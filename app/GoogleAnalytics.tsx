@@ -34,7 +34,10 @@ export default function GoogleAnalytics() {
               if (!target) return;
               var href = target.getAttribute('href') || '';
               var text = (target.textContent || '').trim().slice(0, 100);
-              if (href.indexOf('mailto:') === 0) track('contact_email_click', {link_text: text});
+              var bookCta = target.getAttribute('data-book-cta');
+              if (bookCta === 'gumroad') track('book_gumroad_click', {link_text: text});
+              else if (bookCta === 'amazon') track('book_amazon_click', {link_text: text});
+              else if (href.indexOf('mailto:') === 0) track('contact_email_click', {link_text: text});
               else if (href.indexOf('tel:') === 0) track('contact_phone_click', {link_text: text});
               else if (href.indexOf('wa.me') !== -1 || href.indexOf('whatsapp') !== -1) track('contact_whatsapp_click', {link_text: text});
               else if (href.indexOf('#contact') !== -1 || href.indexOf('#book') !== -1) track('contact_cta_click', {link_text: text});
