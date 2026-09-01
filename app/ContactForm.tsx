@@ -3,6 +3,8 @@
 import {FormEvent, useState} from 'react';
 import {ArrowUpRight} from 'lucide-react';
 
+const Required = () => <span className="required-mark" aria-hidden="true">*</span>;
+
 export default function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
@@ -49,16 +51,16 @@ export default function ContactForm() {
       <input type="hidden" name="_template" value="table" />
       <input type="hidden" name="_url" value="https://siddharthbhattacharjee.in/#booking" />
       <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{position:'absolute',left:'-9999px',width:1,height:1,opacity:0}} />
-      <label>Name<input name="name" required placeholder="Your name" /></label>
-      <label>Work email<input type="email" name="email" required placeholder="you@company.com" /></label>
-      <label>Company / website<input name="company" required placeholder="Company or website URL" /></label>
-      <label>What do you need help with?
+      <label>Name <Required /><input name="name" required placeholder="Your name" /></label>
+      <label>Work email <Required /><input type="email" name="email" required placeholder="you@company.com" /></label>
+      <label>Company / website <Required /><input name="company" required placeholder="Company or website URL" /></label>
+      <label>What do you need help with? <Required />
         <select name="service" required defaultValue="">
           <option value="" disabled>Select an area</option>
           <option>Marketing strategy</option><option>Landing page / conversion</option><option>Growth / acquisition</option><option>Brand / positioning</option><option>Product marketing / GTM</option><option>CRM / retention</option><option>Fractional marketing advisory</option><option>Something else</option>
         </select>
       </label>
-      <label>What are you trying to achieve, and what is getting in the way?
+      <label>What are you trying to achieve, and what is getting in the way? <Required />
         <textarea name="message" rows={5} minLength={30} required placeholder="Give me enough context to understand the business problem, what you have tried and what you need to change." />
       </label>
       {error && <p className="form-error" role="alert">{error}</p>}
