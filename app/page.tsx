@@ -14,6 +14,18 @@ const services: Service[] = [
 
 export default function Home() {
   return <main>
+    <style>{`
+      .cta-contact-stack{display:grid;gap:12px;margin-top:24px}
+      .cta-primary{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 20px;background:#11110f;color:#fff;border:1px solid #11110f;border-radius:16px;transition:transform .2s ease,box-shadow .2s ease}
+      .cta-primary:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.16)}
+      .cta-primary span{display:grid;gap:5px}.cta-primary strong{font-size:17px}.cta-primary small{font-size:12px;opacity:.7}
+      .cta-secondary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+      .cta-secondary .contact-option{min-width:0;padding:14px 13px;border:1px solid rgba(17,17,15,.18);background:rgba(255,255,255,.18);color:#11110f;border-radius:13px}
+      .cta-secondary .contact-option:hover{background:rgba(255,255,255,.38);border-color:rgba(17,17,15,.35)}
+      .cta-secondary .contact-option strong{font-size:13px}.cta-secondary .contact-option small{font-size:10px;opacity:.65}
+      @media(max-width:700px){.cta-secondary{grid-template-columns:1fr}.cta-primary{padding:19px 18px}.cta-secondary .contact-option{padding:15px 14px}}
+    `}</style>
+
     <section className="container hero">
       <div className="hero-copy-wrap">
         <div className="eyebrow">Marketing leader · strategist · consultant</div>
@@ -51,7 +63,7 @@ export default function Home() {
 
     <section className="container section"><div className="section-head"><h2 className="display">The marketing<br/>playbook.</h2><p>Long-form thinking on marketing, growth, brand, SEO and building businesses people actually want.</p></div><div className="blog-grid"><Link className="post featured" href="/blog/what-is-full-stack-marketing"><div className="num">Featured · Marketing Strategy</div><h3>Full-stack marketing: why modern marketers need to think beyond channels</h3><p>The modern marketer needs to connect brand, growth, product, CRM, data and distribution into one system.</p><div className="meta">7 min read <MoveUpRight size={14}/></div></Link><div style={{display:'grid',gap:16}}><Link className="post" href="/blog/how-to-build-a-marketing-strategy"><div className="num">Strategy</div><h3>How to build a marketing strategy that actually drives growth</h3><div className="meta">9 min read <MoveUpRight size={14}/></div></Link><Link className="post" href="/blog/when-to-hire-a-fractional-marketing-leader"><div className="num">Marketing Leadership</div><h3>When should you hire a fractional marketing leader?</h3><div className="meta">7 min read <MoveUpRight size={14}/></div></Link></div></div></section>
 
-    <section className="container cta" id="contact"><div className="cta-box"><div><div className="eyebrow">Have a marketing problem?</div><h2>Let&apos;s make it a growth problem.</h2><p className="cta-note">Tell me what you&apos;re building, what is stuck and what outcome matters. I&apos;ll come prepared.</p></div><div><div className="contact-options"><a className="contact-option" href="#booking"><span><strong>Book a call</strong><small>Start with a short brief</small></span><CalendarDays size={17}/></a><a className="contact-option" href="https://wa.me/917093142389" target="_blank" rel="noreferrer"><span><strong>WhatsApp</strong><small>Message me directly</small></span><ArrowUpRight size={17}/></a><a className="contact-option" href="tel:+917093142389"><span><strong>Call</strong><small>+91 70931 42389</small></span><ArrowUpRight size={17}/></a><a className="contact-option" href="mailto:email@siddharthbhattacharjee.in"><span><strong>Email</strong><small>email@siddharthbhattacharjee.in</small></span><ArrowUpRight size={17}/></a></div></div></div></section>
+    <section className="container cta" id="contact"><div className="cta-box"><div><div className="eyebrow">Have a marketing problem?</div><h2>Let&apos;s make it a growth problem.</h2><p className="cta-note">Tell me what you&apos;re building, what is stuck and what outcome matters. I&apos;ll come prepared.</p></div><div className="cta-contact-stack"><a className="cta-primary" href="#booking"><span><strong>Book a call</strong><small>Start with a short brief</small></span><CalendarDays size={18}/></a><div className="cta-secondary"><a className="contact-option" href="https://wa.me/917093142389" target="_blank" rel="noreferrer"><span><strong>WhatsApp</strong><small>Message me</small></span><ArrowUpRight size={15}/></a><a className="contact-option" href="tel:+917093142389"><span><strong>Call</strong><small>+91 70931 42389</small></span><ArrowUpRight size={15}/></a><a className="contact-option" href="mailto:email@siddharthbhattacharjee.in"><span><strong>Email</strong><small>Send an email</small></span><ArrowUpRight size={15}/></a></div></div></div></section>
 
     <section className="container booking" id="booking"><div className="booking-card"><div><div className="eyebrow">Send a brief</div><h2 className="display">A little context.<br/>Then we talk.</h2><p>Keep it short. This helps me understand whether I&apos;m the right person before we spend 30 minutes together.</p><div className="booking-points"><span>30-minute strategy call</span><span>No sales pitch</span><span>Practical next steps</span></div></div><ContactForm /></div></section>
   </main>;
