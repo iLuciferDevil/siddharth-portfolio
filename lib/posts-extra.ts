@@ -1,0 +1,37 @@
+import type {Post} from './posts';
+
+export const extraPosts:Post[]=[
+{slug:"when-your-marketing-agency-isnt-the-problem",title:"Your marketing agency is busy. That doesn’t mean your marketing is working.",excerpt:"A practical way for CEOs and founders to tell whether an agency is actually moving the business forward, or simply producing more marketing activity.",date:"2026-09-02",readTime:"13 min read",category:"Marketing Leadership",content:[
+{type:"p",text:"One of the more uncomfortable conversations a founder can have with a marketing agency is also one of the simplest: ‘We are doing a lot. Why is the business not growing?’"},
+{type:"p",text:"The answer is not always that the agency is bad. Quite often, the setup itself makes it difficult for anyone to see what is really happening. The agency is measured on leads, impressions, clicks and campaigns. The founder is looking at revenue, margin and cash. Both sides can be busy, both sides can have a convincing dashboard, and the gap between them can keep getting wider."},
+{type:"h2",text:"Start with the number the CEO actually cares about"},
+{type:"p",text:"Before reviewing campaigns, write down the business outcome marketing is supposed to influence. It might be new revenue, qualified pipeline, profitable customers, repeat purchase or a successful launch. Then put a number and a time period against it."},
+{type:"p",text:"For example: ‘We need ₹5 crore of incremental gross-margin contribution from new customers in the next two quarters.’ That is a much more useful starting point than ‘We need to improve our digital presence.’ It gives the marketing team something commercial to solve and gives the CEO a way to judge whether the work matters."},
+{type:"h2",text:"Then follow the money backwards"},
+{type:"p",text:"Take the target and work backwards through the customer journey. How many customers are required? What conversion rate is realistic? What kind of customers are worth acquiring? How much can the company afford to spend to acquire them? How long does it take for the revenue to become gross margin?"},
+{type:"p",text:"This is where a lot of agency reporting starts to fall apart. A lead is not a customer. A customer is not necessarily a good customer. And attributed revenue is not automatically incremental revenue."},
+{type:"h2",text:"The five questions I would ask in an agency review"},
+{type:"ul",text:"What business outcome are we trying to change? Which customer segment is producing the best economics? Where exactly is the funnel leaking? What have we learned from the last 90 days that changes what we should do next? If we doubled the budget tomorrow, what would break first?"},
+{type:"p",text:"That last question is particularly revealing. If the answer is ‘we would just get more leads’, I would want to know what happens after those leads arrive. If sales capacity is already full, conversion is weak or customers are churning, more acquisition may simply create a more expensive version of the same problem."},
+{type:"h2",text:"Look at the agency’s output, not its activity"},
+{type:"p",text:"An agency can send a lot of evidence that it is working. Campaign calendars. New creatives. Keyword reports. CTR improvements. Reach. Engagement. Landing-page tests. Weekly calls. None of these are bad. They are just not the same thing as business progress."},
+{type:"p",text:"I like to separate agency output into three buckets: things delivered, things learned and things changed. The first bucket is execution. The second is intelligence. The third is business impact. If the monthly report is full of the first bucket and almost empty on the other two, you have an activity machine, not a growth partner."},
+{type:"h2",text:"A simple 90-day test"},
+{type:"p",text:"If you are unsure whether the problem is the agency, the strategy or the operating model, do not start with a dramatic agency change. Run a 90-day reset."},
+{type:"ul",text:"Days 1–15: agree on the commercial target, customer segments, unit economics and one primary growth constraint. Days 16–30: audit the funnel, tracking, creative, landing experience, sales handoff and retention signals. Days 31–60: run a small number of tests against the diagnosed constraint. Days 61–90: scale what worked, kill what did not and make the next budget decision using the evidence."},
+{type:"p",text:"The important part is the decision rule. Do not decide at the end of 90 days based on whether the agency feels more proactive. Decide based on whether the evidence changed your understanding of the business and whether the interventions improved the metric that actually matters."},
+{type:"h2",text:"There are three agency problems, and they need different fixes"},
+{type:"p",text:"Sometimes the agency is genuinely underperforming. The strategy is weak, execution is poor and learning is slow. Change the partner."},
+{type:"p",text:"Sometimes the agency is doing exactly what it was hired to do, but it was hired for the wrong job. If the business needs positioning, pricing, product marketing, funnel redesign or go-to-market leadership, asking a performance agency for more leads is a category error. Change the brief, not necessarily the agency."},
+{type:"p",text:"And sometimes the agency is fine, but there is no internal owner making the hard decisions. The agency cannot decide which customer segment the company should prioritise, whether the product proposition is strong enough, how sales should qualify leads or whether the economics justify scaling. That is a leadership problem."},
+{type:"h2",text:"What a healthy agency relationship looks like"},
+{type:"p",text:"The best agency relationship I have seen is not the one with the most meetings. It is the one where the agency knows what it owns, the internal team knows what it owns, and both can explain how their work connects to the same commercial objective."},
+{type:"p",text:"The agency should be able to say what it believes, what evidence supports that belief, what it is testing next and what would make it change its mind. The client should be able to give it access to the numbers and decisions required to do the job properly."},
+{type:"h2",text:"The CEO’s job is not to become the marketing manager"},
+{type:"p",text:"A founder should not have to inspect every ad, approve every headline or understand every platform report. That is not strategic oversight. It is a symptom that the marketing operating model is not giving the business enough confidence."},
+{type:"p",text:"The CEO should be able to ask three questions and get clear answers: What are we trying to change? What do we believe is stopping us? What evidence will tell us whether we are right?"},
+{type:"h2",text:"The uncomfortable conclusion"},
+{type:"p",text:"If your agency is producing more and more activity while the business is still asking why growth is not happening, do not automatically spend more, hire another agency or fire the current one."},
+{type:"p",text:"First diagnose the problem. You may discover an agency issue. You may discover a strategy issue. You may discover a product, sales or retention issue. Or you may discover that nobody has been accountable for connecting all of those pieces."},
+{type:"p",text:"That last one is more common than most companies want to admit."}]}
+];
