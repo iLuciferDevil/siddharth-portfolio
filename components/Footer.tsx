@@ -1,2 +1,0 @@
-import Link from 'next/link';
-export default function Footer(){return <footer className="container footer"><div><strong>© 2026 Siddharth Bhattacharjee</strong><span>Marketing consultant · B2B · B2C</span></div><nav><Link href="/services">Services</Link><Link href="/case-studies">Case studies</Link><Link href="/book">Book</Link><Link href="/resources">Resources</Link><Link href="/blog">Writing</Link></nav></footer>}
