@@ -1,3 +1,0 @@
-import Link from 'next/link';
-import { ArrowUpRight } from 'lucide-react';
-export default function Header(){return <header className="container nav"><Link href="/" className="logo">SIDDHARTH<span>.</span></Link><nav className="navlinks"><Link href="/#problems">Problems</Link><Link href="/services">Services</Link><Link href="/case-studies">Case studies</Link><Link href="/blog">Writing</Link></nav><div className="nav-actions"><Link className="ebook-link" href="/book">Get the e-book <ArrowUpRight size={14}/></Link><Link className="pill" href="/#booking">Let&apos;s talk <ArrowUpRight size={14}/></Link></div></header>}
