@@ -10,5 +10,5 @@ export const CONTACT = {
   whatsapp: 'https://wa.me/917093142389',
   phone: '+917093142389',
   phoneLabel: '+91 70931 42389',
-  email: 'contactsiddb.01@gmail.com',
+  email: 'email@siddharthbhattacharjee.in',
 };
