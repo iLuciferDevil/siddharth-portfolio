@@ -1,0 +1,5 @@
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
+import { caseStudies } from '../../lib/case-studies';
+export const metadata={title:'Marketing Case Studies | Siddharth Bhattacharjee',description:'First-hand marketing case studies and original analyses covering growth, B2B, B2C, brand, product marketing and GTM.'};
+export default function CaseStudies(){return <main><section className="container services-hero"><div className="eyebrow">Marketing case studies</div><h1 className="display">What worked.<br/><span>What I learned.</span></h1><p>Some of these are based on my own work. Others are original analyses of marketing systems I find interesting. I&apos;ll always tell you which is which.</p></section><section className="container section"><div className="case-study-grid">{caseStudies.map(c=><Link href={`/case-studies/${c.slug}`} className="case-study-card" key={c.slug}><div className="num">{c.type} · {c.category}</div><h2>{c.title}</h2><p>{c.summary}</p><div className="case-study-bottom"><span>Read case study</span><ArrowUpRight size={16}/></div></Link>)}</div></section></main>}
