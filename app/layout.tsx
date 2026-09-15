@@ -3,6 +3,7 @@ import './globals.css';
 import './insights.css';
 import './resource-gate.css';
 import './resource-gate-overrides.css';
+import './book.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const person = {'@context':'https://schema.org','@type':'Person','name':'Siddharth Bhattacharjee','url':'https://siddharthbhattacharjee.in','jobTitle':'Marketing Consultant','description':'Marketing consultant working with B2B and B2C businesses on strategy, growth, positioning, product marketing, GTM, CRM and SEO.','image':'https://siddharthbhattacharjee.in/siddharth-bhattacharjee.jpg','knowsAbout':['Marketing strategy','B2B marketing','B2C marketing','Growth marketing','Brand strategy','Product marketing','Go-to-market strategy','CRM','SEO']};
-  const book = {'@context':'https://schema.org','@type':'Book','name':'The Sovereign Brand: The AI Marketing Playbook for the Ambitious Professional','author':{'@type':'Person','name':'Siddharth Bhattacharjee'},'bookFormat':'https://schema.org/EBook','url':'https://www.amazon.in/Sovereign-Brand-Marketing-Ambitious-Professional-ebook/dp/B0H1CPMBLN'};
+  const person = {'@context':'https://schema.org','@type':'Person','name':'Siddharth Bhattacharjee','url':'https://siddharthbhattacharjee.in','jobTitle':'Marketing Consultant','description':'Marketing consultant working with B2B and B2C businesses on strategy, growth, positioning, product marketing, GTM, CRM and SEO.','image':'https://siddharthbhattacharjee.in/siddharth-bhattacharjee.jpg','knowsAbout':['Marketing strategy','B2B marketing','B2C marketing','Growth marketing','Brand strategy','Product marketing','Go-to-market strategy','CRM','SEO','AI marketing']};
+  const book = {'@context':'https://schema.org','@type':'Book','name':'The Sovereign Brand: Building Brands in the Age of AI','author':{'@type':'Person','name':'Siddharth Bhattacharjee'},'bookFormat':'https://schema.org/EBook','url':'https://siddharthbhattacharjee.in/book'};
   return <html lang="en"><body><Header />{children}<div className="site-foot"><Footer /></div><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(book) }} /></body></html>;
 }
