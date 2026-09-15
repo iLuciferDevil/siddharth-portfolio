@@ -64,9 +64,7 @@ export default function ResourceGate({slug, title}: {slug: string; title: string
           <div className="eyebrow">Sent</div>
           <h2>Check your inbox.</h2>
           <p>{message}</p>
-          <a className="button" href={`/api/resources/${slug}`} download>
-            Download it now <ArrowUpRight size={16}/>
-          </a>
+          <p className="gate-note">I&apos;ve sent the resource to <strong>{email}</strong>. It should be in your inbox shortly.</p>
         </div>
       </div>
     );
@@ -104,7 +102,7 @@ export default function ResourceGate({slug, title}: {slug: string; title: string
         <div>
           <div className="eyebrow">Get the resource</div>
           <h2>{hasSavedRecipient ? `Update details for ${title}` : 'Where should I send it?'}</h2>
-          <p>Enter your name and email. I&apos;ll send the resource to your inbox, and you can download it immediately too.</p>
+          <p>Enter your name and email. I&apos;ll send the resource to your inbox.</p>
         </div>
       </div>
       <div className="gate-fields">
