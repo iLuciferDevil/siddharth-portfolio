@@ -4,6 +4,7 @@ import './insights.css';
 import './resource-gate.css';
 import './resource-gate-overrides.css';
 import './book.css';
+import './commercial.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
