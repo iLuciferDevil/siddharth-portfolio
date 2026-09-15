@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import {ArrowUpRight,Check} from 'lucide-react';
 
-export const metadata={title:'Marketing Consulting Services',description:'Strategy, growth, positioning, B2B demand, product marketing, GTM, CRM and fractional marketing advisory for founders and business leaders.'};
+export const metadata={title:'Marketing Consulting Services',description:'Strategy, growth, positioning, B2B demand, product marketing, GTM, CRM and fractional marketing advisory for founders and business leaders.',keywords:['marketing consultant India','marketing consultant Bangalore','B2B marketing consultant','growth marketing consultant','brand positioning consultant','product marketing consultant','GTM consultant','fractional marketing consultant']};
 
 const services=[
  {id:'quick',eyebrow:'Start here',title:'Fix one important thing',copy:'A focused intervention when you already know something is wrong but want an experienced diagnosis before spending months fixing it.',items:['Landing page and funnel diagnosis','Positioning and messaging review','Growth problem diagnosis','Founder or leadership strategy session'],out:'A clear diagnosis, prioritised actions and a practical next step.'},
