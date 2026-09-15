@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import './insights.css';
+import './resource-gate.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
