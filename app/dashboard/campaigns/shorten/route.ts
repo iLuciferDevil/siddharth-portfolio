@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 
-async function shorten(url: string) {
+async function shortenIsGd(url: string) {
   const params = new URLSearchParams({ format: 'simple', url });
   const response = await fetch(`https://is.gd/create.php?${params.toString()}`, {
     method: 'GET',
@@ -13,11 +13,26 @@ async function shorten(url: string) {
   const text = (await response.text()).trim();
 
   if (text.startsWith('https://is.gd/')) {
-    return { response, shortUrl: text, error: '' };
+    return { shortUrl: text, error: '' };
   }
 
-  const error = text.replace(/^Error:\s*/i, '').trim();
-  return { response, shortUrl: '', error };
+  return { shortUrl: '', error: text.replace(/^Error:\s*/i, '').trim() };
+}
+
+async function shortenTinyUrl(url: string) {
+  const endpoint = `https://tinyurl.com/create.php?source=indexpage&submit=Make+TinyURL%21&url=${encodeURIComponent(url)}`;
+  const response = await fetch(endpoint, {
+    method: 'GET',
+    cache: 'no-store',
+    headers: { Accept: 'text/html,application/xhtml+xml' },
+  });
+
+  const html = await response.text();
+  const match = html.match(/https:\/\/tinyurl\.com\/[a-zA-Z0-9_-]+/);
+  return {
+    shortUrl: match?.[0] || '',
+    error: match ? '' : 'TinyURL did not return a short URL.',
+  };
 }
 
 export async function POST(request: Request) {
@@ -40,18 +55,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Only HTTPS URLs can be shortened.' }, { status: 400 });
     }
 
-    const result = await shorten(parsed.toString());
-
-    if (!result.shortUrl) {
-      const status = result.error.toLowerCase().includes('rate limit') ? 429 : 502;
-      return NextResponse.json(
-        { error: result.error || 'The shortener is temporarily unavailable.' },
-        { status },
-      );
+    const isGd = await shortenIsGd(parsed.toString());
+    if (isGd.shortUrl) {
+      return NextResponse.json({ shortUrl: isGd.shortUrl, provider: 'is.gd' });
     }
 
-    return NextResponse.json({ shortUrl: result.shortUrl });
+    const tinyUrl = await shortenTinyUrl(parsed.toString());
+    if (tinyUrl.shortUrl) {
+      return NextResponse.json({ shortUrl: tinyUrl.shortUrl, provider: 'tinyurl' });
+    }
+
+    return NextResponse.json(
+      { error: isGd.error || tinyUrl.error || 'No URL shortener is currently available.' },
+      { status: 502 },
+    );
   } catch {
-    return NextResponse.json({ error: 'Unable to create a short URL right now. Please try again in a moment.' }, { status: 502 });
+    return NextResponse.json(
+      { error: 'Unable to create a short URL right now. Please try again in a moment.' },
+      { status: 502 },
+    );
   }
 }
