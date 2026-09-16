@@ -8,6 +8,11 @@ const STORAGE_KEY = 'siddharth-resource-recipient';
 type Recipient = {name: string; email: string};
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
+function track(eventName: string, params: Record<string, string>) {
+  const gtag = (window as typeof window & {gtag?: (name: string, event: string, params?: Record<string, string>) => void}).gtag;
+  if (gtag) gtag('event', eventName, params);
+}
+
 export default function ResourceGate({slug, title}: {slug: string; title: string}) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -50,6 +55,7 @@ export default function ResourceGate({slug, title}: {slug: string; title: string
       setShowForm(false);
       setStatus('sent');
       setMessage(data.message || 'The resource is on its way.');
+      track('resource_lead', {resource_slug: slug, resource_title: title});
     } catch (err) {
       setStatus('error');
       setMessage(err instanceof Error ? err.message : 'Something went wrong.');
