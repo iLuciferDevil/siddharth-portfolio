@@ -38,10 +38,6 @@ export default function Analytics() {
           link_text: text,
           book: 'the_sovereign_brand',
         });
-        gtag('event', 'begin_checkout', {
-          currency: 'USD',
-          items: [{item_id: 'the_sovereign_brand', item_name: 'The Sovereign Brand', item_category: 'Book', affiliation: provider, quantity: 1}],
-        });
       } else if (href.startsWith('#booking')) {
         gtag('event', 'booking_start', { link_text: text });
       } else if (href.startsWith('https://wa.me/') || href.startsWith('whatsapp:')) {
