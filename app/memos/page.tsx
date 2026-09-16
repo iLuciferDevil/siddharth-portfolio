@@ -1,0 +1,7 @@
+import Link from 'next/link';
+import {ArrowUpRight} from 'lucide-react';
+import {memos} from '../../lib/memos';
+
+export const metadata={title:'Marketing Memos',description:'Short strategic memos on lifecycle marketing, growth, AI, brand, measurement and search from Siddharth Bhattacharjee.'};
+
+export default function Memos(){return <main className="surface-pearl commercial-page"><section className="commercial-hero"><div className="container"><p className="label">Marketing memos</p><h1 className="display h-xl">Ideas worth arguing about.</h1><p className="commercial-lead">Shorter than a consulting engagement, deeper than a marketing tip. These memos turn real operating experience and strategic reasoning into practical points of view.</p></div></section><section className="container section"><div className="blog-grid">{memos.map((m,i)=><Link className={`post ${i===0?'featured':''}`} href={`/memos/${m.slug}`} key={m.slug}><span className="eyebrow">{m.theme}</span><h2>{m.title}</h2><p>{m.dek}</p><span className="meta">Read memo <ArrowUpRight size={15}/></span></Link>)}</div></section><section className="surface-ink commercial-close"><div className="container commercial-close-inner"><div><p className="label">More depth</p><h2 className="display h-lg">Read the long-form strategy essays.</h2></div><div><p>When the problem needs a full framework, evidence and operating plan, the long-form library goes deeper.</p><Link className="button" href="/blog">Explore the strategy library <ArrowUpRight size={16}/></Link></div></div></section></main>}
