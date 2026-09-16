@@ -2,27 +2,22 @@ import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 
-function makeAlias(value: unknown) {
-  if (typeof value !== 'string') return '';
-  return value.trim().toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 30);
-}
-
-async function shorten(url: string, alias = '') {
-  const params = new URLSearchParams({ format: 'json', url });
-  if (alias.length >= 5) params.set('shorturl', alias);
-
+async function shorten(url: string) {
+  const params = new URLSearchParams({ format: 'simple', url });
   const response = await fetch(`https://is.gd/create.php?${params.toString()}`, {
     method: 'GET',
     cache: 'no-store',
+    headers: { Accept: 'text/plain' },
   });
 
-  const data = await response.json() as {
-    shorturl?: string;
-    errorcode?: number;
-    errormessage?: string;
-  };
+  const text = (await response.text()).trim();
 
-  return { response, data };
+  if (text.startsWith('https://is.gd/')) {
+    return { response, shortUrl: text, error: '' };
+  }
+
+  const error = text.replace(/^Error:\s*/i, '').trim();
+  return { response, shortUrl: '', error };
 }
 
 export async function POST(request: Request) {
@@ -45,29 +40,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Only HTTPS URLs can be shortened.' }, { status: 400 });
     }
 
-    const requestedAlias = makeAlias(body?.alias);
-    const derivedAlias = makeAlias([
-      parsed.searchParams.get('utm_source'),
-      parsed.searchParams.get('utm_campaign'),
-      parsed.searchParams.get('utm_content'),
-    ].filter(Boolean).join('_'));
-    const alias = requestedAlias || derivedAlias;
+    const result = await shorten(parsed.toString());
 
-    let result = await shorten(parsed.toString(), alias);
-
-    if (!result.data.shorturl && alias && result.data.errorcode === 2) {
-      result = await shorten(parsed.toString());
-    }
-
-    if (!result.response.ok || !result.data.shorturl) {
+    if (!result.shortUrl) {
+      const status = result.error.toLowerCase().includes('rate limit') ? 429 : 502;
       return NextResponse.json(
-        { error: result.data.errormessage || 'The shortener is temporarily unavailable.' },
-        { status: 502 },
+        { error: result.error || 'The shortener is temporarily unavailable.' },
+        { status },
       );
     }
 
-    return NextResponse.json({ shortUrl: result.data.shorturl, aliasUsed: alias || undefined });
+    return NextResponse.json({ shortUrl: result.shortUrl });
   } catch {
-    return NextResponse.json({ error: 'Unable to create a short URL right now.' }, { status: 500 });
+    return NextResponse.json({ error: 'Unable to create a short URL right now. Please try again in a moment.' }, { status: 502 });
   }
 }
