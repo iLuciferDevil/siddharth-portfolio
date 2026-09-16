@@ -30,6 +30,25 @@
     "newVsReturning": {"new": null, "returning": null},
     "notes": "User-level personally identifiable information is intentionally excluded. The dashboard uses aggregated and, where supported, anonymized/cohort-level analytics. Individual identity should not be exposed here."
   },
+  "book": {
+    "period": null,
+    "landingPageViews": null,
+    "uniqueLandingUsers": null,
+    "gumroadClicks": null,
+    "amazonClicks": null,
+    "checkoutStarts": null,
+    "purchases": null,
+    "revenue": null,
+    "currency": null,
+    "purchaseRate": null,
+    "clientConversions": null,
+    "clientConversionRate": null,
+    "seoSessions": null,
+    "aiSessions": null,
+    "topSources": [],
+    "topQueries": [],
+    "notes": "Book purchases are a separate workstream. Site analytics can measure landing-page views, outbound purchase clicks and checkout starts. Verified purchase counts and revenue require transaction data from the selling platform. Client conversion from book purchaser to consulting client will be added later when a reliable cross-system identifier or cohort source is available."
+  },
   "queries": [],
   "pages": [],
   "ai": {"groundingQueries": [], "citedPages": [], "notes": "AI-search data will appear when the connected sources expose it."},
@@ -40,6 +59,7 @@
     {"label": "Priority queries", "target": "5+ top-10 queries in 90 days", "cluster": "SEO"},
     {"label": "AI visibility", "target": "Establish and grow measurable AI-feature visibility", "cluster": "AEO/GEO"},
     {"label": "AI citations", "target": "Build recurring citations for relevant business questions", "cluster": "GEO"},
+    {"label": "Book growth", "target": "Build a measurable search-to-purchase journey for The Sovereign Brand", "cluster": "Book"},
     {"label": "Commercial outcome", "target": "Connect organic discovery to resource leads and consulting enquiries", "cluster": "Business"}
   ]
 }
