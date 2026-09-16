@@ -1,8 +1,13 @@
 'use client';
 
 import Script from 'next/script';
-import { useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { useEffect, usePathname } from 'next/navigation';
+
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
 
 export default function Analytics() {
   const pathname = usePathname();
@@ -11,20 +16,11 @@ export default function Analytics() {
   useEffect(() => {
     if (!measurementId || pathname.startsWith('/dashboard')) return;
 
-    const gtag = (...args: unknown[]) => {
-      const fn = (window as typeof window & {gtag?: (...args: unknown[]) => void}).gtag;
-      if (fn) fn(...args);
-    };
+    const gtag = (...args: unknown[]) => window.gtag?.(...args);
 
-    const pageType = pathname.startsWith('/resources/')
-      ? 'resource_view'
-      : pathname.startsWith('/blog/')
-        ? 'article_view'
-        : pathname === '/book'
-          ? 'book_view'
-          : null;
-
-    if (pageType) gtag('event', pageType, {page_path: pathname});
+    if (pathname === '/book') {
+      gtag('event', 'book_landing_view', { page_path: pathname, book: 'the_sovereign_brand' });
+    }
 
     const onClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
@@ -35,28 +31,36 @@ export default function Analytics() {
       const text = (link.textContent || '').trim().slice(0, 100);
 
       if (href.includes('gumroad.com') || href.includes('amazon.')) {
-        gtag('event', 'book_click', {destination: href, link_text: text});
+        const provider = href.includes('gumroad.com') ? 'gumroad' : 'amazon';
+        gtag('event', 'book_purchase_click', {
+          provider,
+          destination: href,
+          link_text: text,
+          book: 'the_sovereign_brand',
+        });
+        gtag('event', 'begin_checkout', {
+          currency: 'USD',
+          items: [{item_id: 'the_sovereign_brand', item_name: 'The Sovereign Brand', item_category: 'Book', affiliation: provider, quantity: 1}],
+        });
       } else if (href.startsWith('#booking')) {
-        gtag('event', 'booking_start', {link_text: text});
+        gtag('event', 'booking_start', { link_text: text });
       } else if (href.startsWith('https://wa.me/') || href.startsWith('whatsapp:')) {
-        gtag('event', 'contact_click', {channel: 'whatsapp', link_text: text});
+        gtag('event', 'contact_click', { channel: 'whatsapp', link_text: text });
       } else if (href.startsWith('mailto:')) {
-        gtag('event', 'contact_click', {channel: 'email', link_text: text});
+        gtag('event', 'contact_click', { channel: 'email', link_text: text });
       } else if (href.startsWith('tel:')) {
-        gtag('event', 'contact_click', {channel: 'phone', link_text: text});
+        gtag('event', 'contact_click', { channel: 'phone', link_text: text });
       }
     };
 
     const onSubmit = (event: Event) => {
       const form = event.target as HTMLFormElement | null;
       if (!form) return;
-
       if (form.classList.contains('resource-gate')) {
-        gtag('event', 'resource_gate_submit', {page_path: pathname});
+        gtag('event', 'resource_gate_submit', { page_path: pathname });
       }
-
       if (form.classList.contains('lead-form')) {
-        gtag('event', 'consulting_enquiry_submit', {page_path: pathname});
+        gtag('event', 'consulting_enquiry_submit', { page_path: pathname });
       }
     };
 
@@ -73,7 +77,7 @@ export default function Analytics() {
   return <>
     <Script src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`} strategy="afterInteractive" />
     <Script id="google-analytics" strategy="afterInteractive">
-      {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${measurementId}',{send_page_view:true});`}
+      {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${measurementId}',{send_page_view:true});`}
     </Script>
   </>;
 }
