@@ -29,7 +29,6 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const url = typeof body?.url === 'string' ? body.url.trim() : '';
-    const alias = makeAlias(body?.alias);
 
     if (!url) {
       return NextResponse.json({ error: 'A URL is required.' }, { status: 400 });
@@ -46,10 +45,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Only HTTPS URLs can be shortened.' }, { status: 400 });
     }
 
+    const requestedAlias = makeAlias(body?.alias);
+    const derivedAlias = makeAlias([
+      parsed.searchParams.get('utm_source'),
+      parsed.searchParams.get('utm_campaign'),
+      parsed.searchParams.get('utm_content'),
+    ].filter(Boolean).join('_'));
+    const alias = requestedAlias || derivedAlias;
+
     let result = await shorten(parsed.toString(), alias);
 
-    // A custom alias can already be taken. Fall back to a generated is.gd URL
-    // rather than making the user retry the campaign link manually.
     if (!result.data.shorturl && alias && result.data.errorcode === 2) {
       result = await shorten(parsed.toString());
     }
