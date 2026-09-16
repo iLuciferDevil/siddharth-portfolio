@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   openGraph: { title: 'Siddharth Bhattacharjee | Marketing Consultant', description: 'Find the growth problem that is costing you the most - then fix it.', url: 'https://siddharthbhattacharjee.in', siteName: 'Siddharth Bhattacharjee', type: 'website', images: ['/siddharth-bhattacharjee.jpg'] },
   twitter: { card: 'summary_large_image', title: 'Siddharth Bhattacharjee | Marketing Consultant', description: 'Find the growth problem that is costing you the most - then fix it.', images: ['/siddharth-bhattacharjee.jpg'] },
   robots: { index: true, follow: true },
+  verification: {
+    google: 'icSOgF7PEnrS5H5keu90qy5ZE0Ry9dlNaaXVmucSvuA',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
