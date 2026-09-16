@@ -6,10 +6,10 @@ import {Menu,X,BookOpen} from 'lucide-react';
 
 const links=[
  {href:'/#problems',label:'What I fix'},
- {href:'/#proof',label:'Results'},
+ {href:'/case-studies',label:'Proof of work'},
  {href:'/services',label:'Services'},
- {href:'/case-studies',label:'Case studies'},
- {href:'/blog',label:'Writing'},
+ {href:'/memos',label:'Memos'},
+ {href:'/about',label:'About'},
 ];
 
 export default function Header(){
