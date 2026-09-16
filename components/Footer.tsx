@@ -10,8 +10,10 @@ export default function Footer() {
         <span>{CONTACT.phoneLabel} · {CONTACT.email}</span>
       </div>
       <nav>
+        <Link href="/about">About</Link>
         <Link href="/services">Services</Link>
-        <Link href="/case-studies">Case studies</Link>
+        <Link href="/case-studies">Proof of work</Link>
+        <Link href="/memos">Marketing memos</Link>
         <Link href="/blog">Writing</Link>
         <Link href="/resources">Free resources</Link>
         <Link href="/book">The book</Link>
