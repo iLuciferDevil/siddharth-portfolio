@@ -31,10 +31,14 @@ export default function Analytics() {
       const href = link.getAttribute('href') || '';
       const text = (link.textContent || '').trim().slice(0, 100);
 
-      if (href.includes('gumroad.com') || href.includes('amazon.')) {
-        const provider = href.includes('gumroad.com') ? 'gumroad' : 'amazon';
-        gtag('event', 'book_purchase_click', {
-          provider,
+      if (href.includes('gumroad.com')) {
+        gtag('event', 'book_gumroad_click', {
+          destination: href,
+          link_text: text,
+          book: 'the_sovereign_brand',
+        });
+      } else if (href.includes('amazon.')) {
+        gtag('event', 'book_amazon_click', {
           destination: href,
           link_text: text,
           book: 'the_sovereign_brand',
