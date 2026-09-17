@@ -31,17 +31,21 @@ export default function Analytics() {
       const href = link.getAttribute('href') || '';
       const text = (link.textContent || '').trim().slice(0, 100);
 
-      if (href.includes('gumroad.com')) {
-        gtag('event', 'book_gumroad_click', {
+      if (href.includes('gumroad.com') || href.includes('amazon.')) {
+        const eventName = href.includes('gumroad.com') ? 'book_gumroad_click' : 'book_amazon_click';
+
+        // These are outbound links. Use Beacon + callback so the event has a chance to
+        // reach GA4 before the browser leaves the page for the external destination.
+        event.preventDefault();
+        gtag('event', eventName, {
           destination: href,
           link_text: text,
           book: 'the_sovereign_brand',
-        });
-      } else if (href.includes('amazon.')) {
-        gtag('event', 'book_amazon_click', {
-          destination: href,
-          link_text: text,
-          book: 'the_sovereign_brand',
+          transport_type: 'beacon',
+          event_callback: () => {
+            window.open(href, '_blank', 'noopener,noreferrer');
+          },
+          event_timeout: 1500,
         });
       } else if (href.startsWith('#booking')) {
         gtag('event', 'booking_start', { link_text: text });
