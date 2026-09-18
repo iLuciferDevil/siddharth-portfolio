@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import { ArrowUpRight, Search, Sparkles, Target, TrendingUp, Users, MousePointerClick, Download, CalendarCheck, Clock3, Globe2, Smartphone, UserRoundCheck } from 'lucide-react';
 import './dashboard.css';
 
@@ -33,7 +31,7 @@ type DashboardData = {
  opportunities:{title:string;detail:string;type?:string}[]; goals:{label:string;target:string;cluster:string}[];
  periods?:Record<string, Snapshot>;
 };
-function readData(){const file=path.join(process.cwd(),'public','data','search-dashboard.json');return JSON.parse(fs.readFileSync(file,'utf8')) as DashboardData;}
+function readData(){return require('../../public/data/search-dashboard.json') as DashboardData;}
 function n(v:number|null,s=''){return v===null?'Awaiting data':`${v.toLocaleString()}${s}`;}
 function p(v:number|null){return v===null?'Awaiting data':`${v.toFixed(1)}%`;}
 function pos(v:number|null){return v===null?'Awaiting data':v.toFixed(1);}
