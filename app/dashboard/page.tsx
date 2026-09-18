@@ -1,4 +1,5 @@
 import { ArrowUpRight, Search, Sparkles, Target, TrendingUp, Users, MousePointerClick, Download, CalendarCheck, Clock3, Globe2, Smartphone, UserRoundCheck } from 'lucide-react';
+import dashboardData from '../../public/data/search-dashboard.json';
 import './dashboard.css';
 
 export const metadata = { title: 'Private Search & Funnel Dashboard | Siddharth Bhattacharjee', description: 'Private SEO, AEO, GEO and full-funnel performance dashboard.', robots: { index: false, follow: false, nocache: true } };
@@ -31,7 +32,7 @@ type DashboardData = {
  opportunities:{title:string;detail:string;type?:string}[]; goals:{label:string;target:string;cluster:string}[];
  periods?:Record<string, Snapshot>;
 };
-function readData(){return require('../../public/data/search-dashboard.json') as DashboardData;}
+function readData(){return dashboardData as DashboardData;}
 function n(v:number|null,s=''){return v===null?'Awaiting data':`${v.toLocaleString()}${s}`;}
 function p(v:number|null){return v===null?'Awaiting data':`${v.toFixed(1)}%`;}
 function pos(v:number|null){return v===null?'Awaiting data':v.toFixed(1);}
