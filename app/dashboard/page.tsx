@@ -9,12 +9,17 @@ export const dynamic = 'force-dynamic';
 type FunnelItem = { label: string; value: number | null; rate?: number | null };
 type Snapshot = {
   period: string;
-  current: DashboardData['current'];
-  change: DashboardData['change'];
-  funnel: DashboardData['funnel'];
-  queries: DashboardData['queries'];
-  pages: DashboardData['pages'];
-  ai: DashboardData['ai'];
+  clicks: number|null; impressions: number|null; ctr: number|null; position: number|null;
+  nonBrandedClicks: number|null; nonBrandedImpressions: number|null; aiFeatureImpressions: number|null; aiCitations: number|null; citedPages: number|null;
+  users: number|null; newUsers: number|null; returningUsers: number|null; sessions: number|null; engagedSessions: number|null; engagementRate: number|null;
+  organicSessions: number|null; aiSessions: number|null; resourceViews: number|null; resourceDownloads: number|null; resourceLeads: number|null; consultingEnquiries: number|null;
+  bookingStarts: number|null; bookingCompletions: number|null; bookClicks: number|null; conversionRate: number|null;
+  topSources?: {source:string;sessions:number|null;conversions?:number|null}[]|null;
+  topLandingPages?: {page:string;sessions:number|null;engagementRate?:number|null}[]|null;
+  devices?: {device:string;users:number|null;sessions?:number|null;share?:number|null}[]|null;
+  countries?: {country:string;users:number|null;sessions?:number|null;share?:number|null}[]|null;
+  queries?: {query:string;clicks:number|null;impressions:number|null;position:number|null;change?:number|null}[];
+  pages?: {page:string;clicks:number|null;impressions:number|null;position:number|null;change?:number|null}[];
 };
 type DashboardData = {
  updatedAt:string|null; status:string; site:string;
@@ -41,7 +46,14 @@ export default async function Dashboard({searchParams}:{searchParams?:Promise<{r
  const params=searchParams?await searchParams:{};
  const range=ranges.some(x=>x[0]===params.range)?(params.range as string):'28d';
  const snapshot=d.periods?.[range];
- const view=snapshot?{...d,current:snapshot.current,change:snapshot.change,funnel:snapshot.funnel,queries:snapshot.queries,pages:snapshot.pages,ai:snapshot.ai}:{...d};
+ const view=snapshot?{...d,
+  current:{...d.current,period:snapshot.period,clicks:snapshot.clicks,impressions:snapshot.impressions,ctr:snapshot.ctr,position:snapshot.position,nonBrandedClicks:snapshot.nonBrandedClicks,nonBrandedImpressions:snapshot.nonBrandedImpressions,aiFeatureImpressions:snapshot.aiFeatureImpressions,aiCitations:snapshot.aiCitations,citedPages:snapshot.citedPages},
+  change:{...d.change,clicks:snapshot.clicks,impressions:snapshot.impressions,ctr:snapshot.ctr,position:snapshot.position},
+  funnel:{...d.funnel,period:snapshot.period,users:snapshot.users,newUsers:snapshot.newUsers,returningUsers:snapshot.returningUsers,sessions:snapshot.sessions,engagedSessions:snapshot.engagedSessions,engagementRate:snapshot.engagementRate,organicSessions:snapshot.organicSessions,aiSessions:snapshot.aiSessions,resourceViews:snapshot.resourceViews,resourceDownloads:snapshot.resourceDownloads,resourceLeads:snapshot.resourceLeads,consultingEnquiries:snapshot.consultingEnquiries,bookingStarts:snapshot.bookingStarts,bookingCompletions:snapshot.bookingCompletions,bookClicks:snapshot.bookClicks,conversionRate:snapshot.conversionRate,topSources:snapshot.topSources??d.funnel.topSources,topLandingPages:(snapshot.topLandingPages??[]).map(x=>({path:x.page,sessions:x.sessions,engagementRate:x.engagementRate})),devices:(snapshot.devices??[]).map(x=>({device:x.device,users:x.users,share:x.share})),countries:(snapshot.countries??[]).map(x=>({country:x.country,users:x.users,share:x.share}))},
+  queries:snapshot.queries??d.queries,
+  pages:(snapshot.pages??[]).map(x=>({path:x.page,clicks:x.clicks,impressions:x.impressions,position:x.position,change:x.change})),
+  ai:{...d.ai}
+}:{...d};
  const rangeLabel=ranges.find(x=>x[0]===range)?.[1]||'Last 28 days';
  const fresh=d.updatedAt?new Date(d.updatedAt).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'Not synced yet';
  const c=[
