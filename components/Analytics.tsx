@@ -65,7 +65,8 @@ export default function Analytics() {
         gtag('event', 'resource_gate_submit', { page_path: pathname });
       }
       if (form.classList.contains('lead-form')) {
-        gtag('event', 'consulting_enquiry_submit', { page_path: pathname });
+        const eventName = form.classList.contains('diagnostic-form') ? 'marketing_growth_diagnostic_submit' : 'consulting_enquiry_submit';
+        gtag('event', eventName, { page_path: pathname, form_id: form.id || undefined });
       }
     };
 
