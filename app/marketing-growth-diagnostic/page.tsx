@@ -50,7 +50,6 @@ export default function MarketingGrowthDiagnosticPage() {
     const eventId = `diagnostic_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const formData = new FormData(form);
     const email = String(formData.get('email') || '');
-    window.trackMarketingEvent?.('marketing_growth_diagnostic_submit', { form_id: form.id });
     window.fbq?.('track', 'Lead', { content_name: 'Marketing Growth Diagnostic', value: 2500, currency: 'INR' }, { eventID: eventId });
     fetch('/api/meta-capi', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event_name: 'Lead', event_id: eventId, event_source_url: window.location.href, email }) }).catch(() => undefined);
     fetch(form.action, {method: 'POST', body: new FormData(form), headers: {'Accept': 'application/json'}})
