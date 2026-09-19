@@ -31,7 +31,8 @@ type DashboardData = {
  opportunities:{title:string;detail:string;type?:string}[]; goals:{label:string;target:string;cluster:string}[];
  periods?:Record<string, Snapshot>;
 };
-const INITIAL_DATA = require('../public/data/search-dashboard.json') as DashboardData;
+import rawInitialData from './data/search-dashboard';
+const INITIAL_DATA = rawInitialData as unknown as DashboardData;
 function n(v:number|null,s=''){return v===null?'Awaiting data':`${v.toLocaleString()}${s}`;}
 function p(v:number|null){return v===null?'Awaiting data':`${v.toFixed(1)}%`;}
 function pos(v:number|null){return v===null?'Awaiting data':v.toFixed(1);}
