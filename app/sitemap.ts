@@ -12,6 +12,7 @@ export default function sitemap():MetadataRoute.Sitemap{
   {url:base,lastModified:now,changeFrequency:'weekly',priority:1},
   {url:`${base}/about`,lastModified:now,changeFrequency:'monthly',priority:.9},
   {url:`${base}/services`,lastModified:now,changeFrequency:'monthly',priority:.9},
+  {url:`${base}/marketing-growth-diagnostic`,lastModified:now,changeFrequency:'weekly',priority:1},
   {url:`${base}/case-studies`,lastModified:now,changeFrequency:'monthly',priority:.95},
   {url:`${base}/book`,lastModified:now,changeFrequency:'monthly',priority:.9},
   {url:`${base}/memos`,lastModified:now,changeFrequency:'weekly',priority:.85},
