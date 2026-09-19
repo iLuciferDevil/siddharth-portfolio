@@ -116,10 +116,10 @@ export default function MarketingGrowthDiagnosticPage() {
           <div>
             <p className="diagnostic-eyebrow">FIRST 5 CLIENTS</p>
             <h2>Tell me what is stuck.</h2>
-            <p>Send a short brief. I will review the problem before we speak. If the diagnostic is not a sensible fit, I will tell you.</p>
+            <p>Send a short brief. I will review the problem before we speak. If the diagnostic is a sensible fit, I will send the payment details after reviewing your brief.</p>
             <div className="diagnostic-trust"><span><Clock3 size={16}/>60-90 minutes</span><span><ShieldCheck size={16}/>No long-term commitment</span></div>
           </div>
-          <form id="diagnostic-form" className="diagnostic-form" action={`https://formsubmit.co/${CONTACT.email}`} method="POST" onSubmit={handleSubmit}>
+          <form id="diagnostic-form" className="diagnostic-form lead-form" action={`https://formsubmit.co/${CONTACT.email}`} method="POST" onSubmit={handleSubmit}>
             <input type="hidden" name="_subject" value="Marketing Growth Diagnostic enquiry" />
             <input type="hidden" name="_captcha" value="false" />
             <input type="hidden" name="_template" value="table" />
@@ -129,7 +129,7 @@ export default function MarketingGrowthDiagnosticPage() {
             <label>Work email<input type="email" name="email" required placeholder="you@company.com" /></label>
             <label>Company / website<input name="company" required placeholder="Company name or website" /></label>
             <label>What is stuck?<textarea name="message" required rows={5} placeholder="What are you trying to achieve, and what is getting in the way?" /></label>
-            <button className="diagnostic-button" type="submit">Apply for ₹2,500 diagnostic <ArrowRight size={17}/></button>
+            <button className="diagnostic-button" type="submit">Apply for the ₹2,500 diagnostic <ArrowRight size={17}/></button>
             {submitted && <p className="diagnostic-success">Thanks. Your brief has been sent. I will review it and get back to you personally.</p>}
             {error && <p className="diagnostic-error">Something went wrong while sending the form. Please email {CONTACT.email} directly.</p>}
             <p className="diagnostic-form-note">Your information is used only to respond to this enquiry.</p>
