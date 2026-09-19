@@ -45,12 +45,14 @@ export default function MarketingGrowthDiagnosticPage() {
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    e.stopPropagation();
     setError(false);
     const form = e.currentTarget;
     const eventId = `diagnostic_${Date.now()}_${Math.random().toString(36).slice(2)}`;
     const formData = new FormData(form);
     const email = String(formData.get('email') || '');
     window.fbq?.('track', 'Lead', { content_name: 'Marketing Growth Diagnostic', value: 2500, currency: 'INR' }, { eventID: eventId });
+    window.trackMarketingEvent?.('marketing_growth_diagnostic_submit', { form_id: 'diagnostic-form' });
     fetch('/api/meta-capi', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event_name: 'Lead', event_id: eventId, event_source_url: window.location.href, email }) }).catch(() => undefined);
     fetch(form.action, {method: 'POST', body: new FormData(form), headers: {'Accept': 'application/json'}})
       .then((res) => {
@@ -137,7 +139,7 @@ export default function MarketingGrowthDiagnosticPage() {
             <p>Send a short brief. I will review the problem before we speak. If the diagnostic is a sensible fit, I will send the payment details after reviewing your brief.</p>
             <div className="diagnostic-trust"><span><Clock3 size={16}/>60-90 minutes</span><span><ShieldCheck size={16}/>No long-term commitment</span></div>
           </div>
-          <form id="diagnostic-form" className="diagnostic-form lead-form" onFocusCapture={handleFormStart} action={`https://formsubmit.co/${CONTACT.email}`} method="POST" onSubmit={handleSubmit}>
+          <form id="diagnostic-form" className="diagnostic-form lead-form" onFocusCapture={handleFormStart} action={`https://formsubmit.co/ajax/${CONTACT.email}`} method="POST" onSubmit={handleSubmit}>
             <input type="hidden" name="_subject" value="Marketing Growth Diagnostic enquiry" />
             <input type="hidden" name="_captcha" value="false" />
             <input type="hidden" name="_template" value="table" />
