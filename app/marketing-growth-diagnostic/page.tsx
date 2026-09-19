@@ -53,10 +53,10 @@ export default function MarketingGrowthDiagnosticPage() {
       <section className="diagnostic-hero">
         <div className="diagnostic-container diagnostic-hero-grid">
           <div>
-            <p className="diagnostic-eyebrow">MARKETING GROWTH DIAGNOSTIC · FIRST 5 CLIENTS</p>
+            <p className="diagnostic-eyebrow">MARKETING GROWTH DIAGNOSTIC · LIMITED-TIME OFFER</p>
             <h1>Something in your marketing is not working. Find out what.</h1>
             <p className="diagnostic-lead">A focused 60-90 minute working session to identify the biggest marketing problem in the business, what is causing it, and what you should fix first.</p>
-            <div className="diagnostic-price"><strong>₹2,500</strong><span>Founding-client price · first 5 companies</span></div>
+            <div className="diagnostic-price"><span className="diagnostic-original-price">₹7,500</span><strong>₹2,500</strong><span>Limited-time pricing</span></div>
             <a className="diagnostic-button" href="#apply">Apply for a diagnostic <ArrowRight size={17}/></a>
             <p className="diagnostic-micro">No long-term commitment. No 40-page audit. No generic recommendations.</p>
           </div>
@@ -114,7 +114,7 @@ export default function MarketingGrowthDiagnosticPage() {
       <section className="diagnostic-apply" id="apply">
         <div className="diagnostic-container diagnostic-apply-grid">
           <div>
-            <p className="diagnostic-eyebrow">FIRST 5 CLIENTS</p>
+            <p className="diagnostic-eyebrow">LIMITED-TIME OFFER</p>
             <h2>Tell me what is stuck.</h2>
             <p>Send a short brief. I will review the problem before we speak. If the diagnostic is a sensible fit, I will send the payment details after reviewing your brief.</p>
             <div className="diagnostic-trust"><span><Clock3 size={16}/>60-90 minutes</span><span><ShieldCheck size={16}/>No long-term commitment</span></div>
@@ -137,7 +137,7 @@ export default function MarketingGrowthDiagnosticPage() {
         </div>
       </section>
 
-      <footer className="diagnostic-footer"><a href="/">Siddharth Bhattacharjee</a><span>Marketing Growth Diagnostic · ₹2,500 · First 5 clients</span></footer>
+      <footer className="diagnostic-footer"><a href="/">Siddharth Bhattacharjee</a><span>Marketing Growth Diagnostic · <s>₹7,500</s> ₹2,500 · Limited-time offer</span></footer>
     </main>
   );
 }
