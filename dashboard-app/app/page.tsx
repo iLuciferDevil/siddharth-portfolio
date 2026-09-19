@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowUpRight, Search, Sparkles, Target, TrendingUp, Users, MousePointerClick, Download, CalendarCheck, Clock3, Globe2, Smartphone, UserRoundCheck } from 'lucide-react';
 import './dashboard.css';
 
@@ -31,6 +31,7 @@ type DashboardData = {
  opportunities:{title:string;detail:string;type?:string}[]; goals:{label:string;target:string;cluster:string}[];
  periods?:Record<string, Snapshot>;
 };
+const INITIAL_DATA = require('../public/data/search-dashboard.json') as DashboardData;
 function n(v:number|null,s=''){return v===null?'Awaiting data':`${v.toLocaleString()}${s}`;}
 function p(v:number|null){return v===null?'Awaiting data':`${v.toFixed(1)}%`;}
 function pos(v:number|null){return v===null?'Awaiting data':v.toFixed(1);}
@@ -39,15 +40,8 @@ function Funnel({items}:{items:FunnelItem[]}){return <div className="funnel">{it
 const ranges=[['7d','Last 7 days'],['28d','Last 28 days'],['90d','Last 90 days'],['month','This month'],['prev-month','Previous month'],['baseline','Since baseline']];
 
 export default function DashboardClient(){
- const [d,setD]=useState<DashboardData|null>(null);
+ const [d]=useState<DashboardData>(INITIAL_DATA);
  const [range,setRange]=useState('28d');
- useEffect(()=>{
-  const params=new URLSearchParams(window.location.search);
-  const requested=params.get('range')||'28d';
-  setRange(ranges.some(x=>x[0]===requested)?requested:'28d');
-  fetch('/data/search-dashboard.json',{cache:'no-store'}).then(r=>{if(!r.ok) throw new Error(`Data request failed: ${r.status}`); return r.json();}).then(setD).catch(()=>setD(null));
- },[]);
- if(!d) return <main className="dashboard-page"><div className="dashboard-shell"><div className="dashboard-panel"><div className="panel-kicker">PRIVATE GROWTH INTELLIGENCE</div><h2>Loading dashboard…</h2><p className="panel-note">Connecting to the latest dashboard data.</p></div></div></main>;
  const snapshot=d.periods?.[range];
  const view=snapshot?{...d,
   current:{...d.current,period:snapshot.period,clicks:snapshot.clicks,impressions:snapshot.impressions,ctr:snapshot.ctr,position:snapshot.position,nonBrandedClicks:snapshot.nonBrandedClicks,nonBrandedImpressions:snapshot.nonBrandedImpressions,aiFeatureImpressions:snapshot.aiFeatureImpressions,aiCitations:snapshot.aiCitations,citedPages:snapshot.citedPages},
