@@ -7,20 +7,34 @@ import { usePathname } from 'next/navigation';
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void;
+    fbq?: (...args: unknown[]) => void;
+    lintrk?: (...args: unknown[]) => void;
+    trackMarketingEvent?: (eventName: string, params?: Record<string, unknown>) => void;
   }
 }
 
 export default function Analytics() {
   const pathname = usePathname();
   const measurementId = process.env.NEXT_PUBLIC_GA_ID;
+  const metaPixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+  const linkedInPartnerId = process.env.NEXT_PUBLIC_LINKEDIN_PARTNER_ID;
 
   useEffect(() => {
-    if (!measurementId || pathname.startsWith('/dashboard')) return;
+    if (pathname.startsWith('/dashboard')) return;
 
-    const gtag = (...args: unknown[]) => window.gtag?.(...args);
+    const track = (eventName: string, params: Record<string, unknown> = {}) => {
+      window.gtag?.('event', eventName, { page_path: pathname, ...params });
+      window.fbq?.('trackCustom', eventName, params);
+    };
+
+    window.trackMarketingEvent = track;
+
+    if (pathname === '/marketing-growth-diagnostic') {
+      track('diagnostic_view');
+    }
 
     if (pathname === '/book') {
-      gtag('event', 'book_landing_view', { page_path: pathname, book: 'the_sovereign_brand' });
+      track('book_landing_view', { book: 'the_sovereign_brand' });
     }
 
     const onClick = (event: MouseEvent) => {
@@ -33,28 +47,27 @@ export default function Analytics() {
 
       if (href.includes('gumroad.com') || href.includes('amazon.')) {
         const eventName = href.includes('gumroad.com') ? 'book_gumroad_click' : 'book_amazon_click';
-
-        // These are outbound links. Use Beacon + callback so the event has a chance to
-        // reach GA4 before the browser leaves the page for the external destination.
         event.preventDefault();
-        gtag('event', eventName, {
+        window.gtag?.('event', eventName, {
           destination: href,
           link_text: text,
           book: 'the_sovereign_brand',
           transport_type: 'beacon',
-          event_callback: () => {
-            window.open(href, '_blank', 'noopener,noreferrer');
-          },
+          event_callback: () => window.open(href, '_blank', 'noopener,noreferrer'),
           event_timeout: 1500,
         });
       } else if (href.startsWith('#booking')) {
-        gtag('event', 'booking_start', { link_text: text });
+        track('booking_start', { link_text: text });
       } else if (href.startsWith('https://wa.me/') || href.startsWith('whatsapp:')) {
-        gtag('event', 'contact_click', { channel: 'whatsapp', link_text: text });
+        track('contact_click', { channel: 'whatsapp', link_text: text });
       } else if (href.startsWith('mailto:')) {
-        gtag('event', 'contact_click', { channel: 'email', link_text: text });
+        track('contact_click', { channel: 'email', link_text: text });
       } else if (href.startsWith('tel:')) {
-        gtag('event', 'contact_click', { channel: 'phone', link_text: text });
+        track('contact_click', { channel: 'phone', link_text: text });
+      }
+
+      if (pathname === '/marketing-growth-diagnostic' && href === '#apply') {
+        track('diagnostic_apply_click', { link_text: text });
       }
     };
 
@@ -62,11 +75,13 @@ export default function Analytics() {
       const form = event.target as HTMLFormElement | null;
       if (!form) return;
       if (form.classList.contains('resource-gate')) {
-        gtag('event', 'resource_gate_submit', { page_path: pathname });
+        track('resource_gate_submit');
       }
       if (form.classList.contains('lead-form')) {
-        const eventName = form.classList.contains('diagnostic-form') ? 'marketing_growth_diagnostic_submit' : 'consulting_enquiry_submit';
-        gtag('event', eventName, { page_path: pathname, form_id: form.id || undefined });
+        const eventName = form.classList.contains('diagnostic-form')
+          ? 'marketing_growth_diagnostic_submit'
+          : 'consulting_enquiry_submit';
+        track(eventName, { form_id: form.id || undefined });
       }
     };
 
@@ -75,15 +90,30 @@ export default function Analytics() {
     return () => {
       document.removeEventListener('click', onClick);
       document.removeEventListener('submit', onSubmit);
+      delete window.trackMarketingEvent;
     };
-  }, [measurementId, pathname]);
+  }, [pathname]);
 
-  if (!measurementId || pathname.startsWith('/dashboard')) return null;
+  if (pathname.startsWith('/dashboard')) return null;
 
   return <>
-    <Script src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`} strategy="afterInteractive" />
-    <Script id="google-analytics" strategy="afterInteractive">
-      {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${measurementId}',{send_page_view:true});`}
-    </Script>
+    {measurementId && <>
+      <Script src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`} strategy="afterInteractive" />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${measurementId}',{send_page_view:true});`}
+      </Script>
+    </>}
+
+    {metaPixelId && <>
+      <Script id="meta-pixel" strategy="afterInteractive">
+        {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${metaPixelId}');fbq('track','PageView');`}
+      </Script>
+    </>}
+
+    {linkedInPartnerId && <>
+      <Script id="linkedin-insight" strategy="afterInteractive">
+        {`_linkedin_partner_id = "${linkedInPartnerId}"; window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || []; window._linkedin_data_partner_ids.push(_linkedin_partner_id); (function(l){if(!l){window.lintrk=function(a,b){window.lintrk.q.push([a,b])};window.lintrk.q=[]}var s=document.getElementsByTagName("script")[0];var b=document.createElement("script");b.type="text/javascript";b.async=true;b.src="https://snap.licdn.com/li.lms-analytics/insight.min.js";s.parentNode.insertBefore(b,s)})(window.lintrk);`}
+      </Script>
+    </>}
   </>;
 }
