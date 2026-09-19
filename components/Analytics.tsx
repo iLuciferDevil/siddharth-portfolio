@@ -77,11 +77,8 @@ export default function Analytics() {
       if (form.classList.contains('resource-gate')) {
         track('resource_gate_submit');
       }
-      if (form.classList.contains('lead-form')) {
-        const eventName = form.classList.contains('diagnostic-form')
-          ? 'marketing_growth_diagnostic_submit'
-          : 'consulting_enquiry_submit';
-        track(eventName, { form_id: form.id || undefined });
+      if (form.classList.contains('lead-form') && !form.classList.contains('diagnostic-form')) {
+        track('consulting_enquiry_submit', { form_id: form.id || undefined });
       }
     };
 
