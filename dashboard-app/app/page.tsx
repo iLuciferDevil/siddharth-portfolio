@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import rawInitialData from './data/search-dashboard';
 import { ArrowUpRight, Search, Sparkles, Target, TrendingUp, Users, MousePointerClick, Download, CalendarCheck, Clock3, Globe2, Smartphone, UserRoundCheck } from 'lucide-react';
 import './dashboard.css';
 
@@ -31,8 +32,7 @@ type DashboardData = {
  opportunities:{title:string;detail:string;type?:string}[]; goals:{label:string;target:string;cluster:string}[];
  periods?:Record<string, Snapshot>;
 };
-import rawInitialData from './data/search-dashboard';
-const INITIAL_DATA = rawInitialData as unknown as DashboardData;
+const INITIAL_DATA = rawInitialData as DashboardData;
 function n(v:number|null,s=''){return v===null?'Awaiting data':`${v.toLocaleString()}${s}`;}
 function p(v:number|null){return v===null?'Awaiting data':`${v.toFixed(1)}%`;}
 function pos(v:number|null){return v===null?'Awaiting data':v.toFixed(1);}
