@@ -17,6 +17,7 @@ const reasons = [
 export default function MarketingGrowthDiagnosticPage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
+  const [formStarted, setFormStarted] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -27,13 +28,31 @@ export default function MarketingGrowthDiagnosticPage() {
     Object.entries(fields).forEach(([key, value]) => {
       const input = document.querySelector<HTMLInputElement>(`input[name="${key}"]`);
       if (input) input.value = value;
+      if (value) window.sessionStorage.setItem(key, value);
+    });
+
+    ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach((key) => {
+      const input = document.querySelector<HTMLInputElement>(`input[name="${key}"]`);
+      if (input && !input.value) input.value = window.sessionStorage.getItem(key) || '';
     });
   }, []);
+
+  function handleFormStart() {
+    if (formStarted) return;
+    setFormStarted(true);
+    window.trackMarketingEvent?.('diagnostic_form_start');
+  }
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(false);
     const form = e.currentTarget;
+    const eventId = `diagnostic_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const formData = new FormData(form);
+    const email = String(formData.get('email') || '');
+    window.trackMarketingEvent?.('marketing_growth_diagnostic_submit', { form_id: form.id });
+    window.fbq?.('track', 'Lead', { content_name: 'Marketing Growth Diagnostic', value: 2500, currency: 'INR' }, { eventID: eventId });
+    fetch('/api/meta-capi', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event_name: 'Lead', event_id: eventId, event_source_url: window.location.href, email }) }).catch(() => undefined);
     fetch(form.action, {method: 'POST', body: new FormData(form), headers: {'Accept': 'application/json'}})
       .then((res) => {
         if (!res.ok) throw new Error('Submission failed');
@@ -119,7 +138,7 @@ export default function MarketingGrowthDiagnosticPage() {
             <p>Send a short brief. I will review the problem before we speak. If the diagnostic is a sensible fit, I will send the payment details after reviewing your brief.</p>
             <div className="diagnostic-trust"><span><Clock3 size={16}/>60-90 minutes</span><span><ShieldCheck size={16}/>No long-term commitment</span></div>
           </div>
-          <form id="diagnostic-form" className="diagnostic-form lead-form" action={`https://formsubmit.co/${CONTACT.email}`} method="POST" onSubmit={handleSubmit}>
+          <form id="diagnostic-form" className="diagnostic-form lead-form" onFocusCapture={handleFormStart} action={`https://formsubmit.co/${CONTACT.email}`} method="POST" onSubmit={handleSubmit}>
             <input type="hidden" name="_subject" value="Marketing Growth Diagnostic enquiry" />
             <input type="hidden" name="_captcha" value="false" />
             <input type="hidden" name="_template" value="table" />
