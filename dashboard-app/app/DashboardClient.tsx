@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowUpRight, Search, Sparkles, Target, TrendingUp, Users, MousePointerClick, Download, CalendarCheck, Clock3, Globe2, Smartphone, UserRoundCheck } from 'lucide-react';
 import './dashboard.css';
 
@@ -39,14 +39,7 @@ function Funnel({items}:{items:FunnelItem[]}){return <div className="funnel">{it
 const ranges=[['7d','Last 7 days'],['28d','Last 28 days'],['90d','Last 90 days'],['month','This month'],['prev-month','Previous month'],['baseline','Since baseline']];
 
 export default function DashboardClient({ initialData }: { initialData: DashboardData }){
- const [d,setD]=useState<DashboardData>(initialData);
- const [refreshing,setRefreshing]=useState(false);
- const refreshData=async()=>{
-  try{setRefreshing(true); const r=await fetch('/data/search-dashboard.json?t='+Date.now(),{cache:'no-store'}); if(!r.ok) throw new Error('refresh failed'); const next=await r.json(); setD(next);}
-  catch(e){console.error('Dashboard refresh failed',e);}
-  finally{setRefreshing(false);}
- };
- useEffect(()=>{const id=window.setInterval(refreshData,5*60*1000); return()=>window.clearInterval(id);},[]);
+ const [d]=useState<DashboardData>(initialData);
  const [range,setRange]=useState('28d');
  const snapshot=d.periods?.[range];
  const view=snapshot?{...d,
@@ -67,7 +60,7 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
  ];
  const hasRanges=Boolean(d.periods&&Object.keys(d.periods).length);
  return <main className="dashboard-page"><div className="dashboard-shell">
-  <header className="dashboard-header"><div><div className="dashboard-kicker">Private growth intelligence</div><h1>How people find you, what they do, and where the funnel leaks.</h1><p>SEO, AEO, GEO and the measurable journey from discovery to resource lead or consulting enquiry.</p></div><div className="dashboard-status"><span className={d.status==='awaiting-first-sync'?'status-dot pending':'status-dot'}/><span>Last sync: {fresh}</span><button type="button" className="refresh-button" onClick={refreshData} disabled={refreshing}>{refreshing?"Refreshing…":"Refresh data"}</button></div></header>
+  <header className="dashboard-header"><div><div className="dashboard-kicker">Private growth intelligence</div><h1>How people find you, what they do, and where the funnel leaks.</h1><p>SEO, AEO, GEO and the measurable journey from discovery to resource lead or consulting enquiry.</p></div><div className="dashboard-status"><span className={d.status==='awaiting-first-sync'?'status-dot pending':'status-dot'}/><span>Last sync: {fresh}</span></div></header>
 
   <section className="dashboard-toolbar"><div><div className="toolbar-label">REPORTING PERIOD</div><strong>{rangeLabel}</strong><span>{hasRanges?'Live date-range snapshots are available.':'Date-range snapshots will activate after the first scheduled analytics sync.'}</span></div><form method="get" className="range-form"><label htmlFor="range">Date range</label><select id="range" name="range" defaultValue={range}>{ranges.map(([value,label])=><option value={value} key={value}>{label}</option>)}</select><button type="submit">Apply</button></form><a className="campaign-nav" href="/dashboard/campaigns">Campaign link builder →</a></section>
 
