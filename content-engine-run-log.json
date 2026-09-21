@@ -16,5 +16,25 @@
     "error",
     "next_action"
   ],
-  "runs": []
+  "runs": [
+    {
+      "run_at": "2026-09-21T09:02:30+05:30",
+      "run_type": "MONDAY",
+      "status": "published",
+      "reason": "Candidate passed the Monday gates: distinct high-intent search query, strong consulting relevance, authoritative evidence, practical measurement framework, examples, internal related-content path and a relevant strategy resource/consulting CTA.",
+      "candidates": [
+        "Marketing measurement framework",
+        "How to connect marketing metrics to revenue",
+        "Marketing ROI measurement"
+      ],
+      "title": "Marketing measurement: how to build a system that connects activity to business outcomes",
+      "url": "https://siddharthbhattacharjee.in/blog/marketing-measurement-framework-business-outcomes",
+      "search_intent": "Informational and commercial investigation: build a marketing measurement framework that connects channel activity to business outcomes, economics and decision-making.",
+      "topic_cluster": "Marketing Strategy / Measurement / Analytics",
+      "commit_sha": "78a91940878a6439409dd496a4ea7ca01c975554",
+      "indexnow_result": "not_configured",
+      "error": "",
+      "next_action": "Monitor indexing and search performance; Wednesday review should prioritise the highest-value substantive refresh opportunity rather than publishing new content."
+    }
+  ]
 }
