@@ -39,7 +39,14 @@ function Funnel({items}:{items:FunnelItem[]}){return <div className="funnel">{it
 const ranges=[['7d','Last 7 days'],['28d','Last 28 days'],['90d','Last 90 days'],['month','This month'],['prev-month','Previous month'],['baseline','Since baseline']];
 
 export default function DashboardClient({ initialData }: { initialData: DashboardData }){
- const [d,setD]=useState<DashboardData>(initialData);\n const [refreshing,setRefreshing]=useState(false);\n const refreshData=async()=>{\n  try{setRefreshing(true); const r=await fetch('/data/search-dashboard.json?t='+Date.now(),{cache:'no-store'}); if(!r.ok) throw new Error('refresh failed'); const next=await r.json(); setD(next);}\n  catch(e){console.error('Dashboard refresh failed',e);}\n  finally{setRefreshing(false);}\n };\n useEffect(()=>{const id=window.setInterval(refreshData,5*60*1000); return()=>window.clearInterval(id);},[]);
+ const [d,setD]=useState<DashboardData>(initialData);
+ const [refreshing,setRefreshing]=useState(false);
+ const refreshData=async()=>{
+  try{setRefreshing(true); const r=await fetch('/data/search-dashboard.json?t='+Date.now(),{cache:'no-store'}); if(!r.ok) throw new Error('refresh failed'); const next=await r.json(); setD(next);}
+  catch(e){console.error('Dashboard refresh failed',e);}
+  finally{setRefreshing(false);}
+ };
+ useEffect(()=>{const id=window.setInterval(refreshData,5*60*1000); return()=>window.clearInterval(id);},[]);
  const [range,setRange]=useState('28d');
  const snapshot=d.periods?.[range];
  const view=snapshot?{...d,
