@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowUpRight, Search, Sparkles, Target, TrendingUp, Users, MousePointerClick, Download, CalendarCheck, Clock3, Globe2, Smartphone, UserRoundCheck } from 'lucide-react';
 import './dashboard.css';
 
@@ -39,7 +39,13 @@ function Funnel({items}:{items:FunnelItem[]}){return <div className="funnel">{it
 const ranges=[['7d','Last 7 days'],['28d','Last 28 days'],['90d','Last 90 days'],['month','This month'],['prev-month','Previous month'],['baseline','Since baseline']];
 
 export default function DashboardClient({ initialData }: { initialData: DashboardData }){
- const [d]=useState<DashboardData>(initialData);
+ const [d,setD]=useState<DashboardData>(initialData);
+ useEffect(()=>{
+  fetch('/data/search-dashboard.json',{cache:'no-store'})
+   .then(r=>r.ok?r.json():Promise.reject(new Error('Dashboard data fetch failed')))
+   .then(next=>setD(next as DashboardData))
+   .catch(e=>console.error(e));
+ },[]);
  const [range,setRange]=useState('28d');
  const snapshot=d.periods?.[range];
  const view=snapshot?{...d,
