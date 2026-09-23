@@ -35,6 +35,25 @@
       "indexnow_result": "not_configured",
       "error": "",
       "next_action": "Monitor indexing and search performance; Wednesday review should prioritise the highest-value substantive refresh opportunity rather than publishing new content."
+    },
+    {
+      "run_at": "2026-09-23T09:03:11+05:30",
+      "run_type": "WEDNESDAY",
+      "status": "failed",
+      "reason": "A substantive refresh opportunity was identified in the AI search optimisation article, but the production edit could not be safely committed during this run because the repository write path requires a complete replacement of the large lib/posts.ts file and the available execution path could not safely preserve the full existing file without risking unrelated content changes.",
+      "candidates": [
+        "How to optimise content for AI search without writing generic SEO pages",
+        "AI marketing strategy: stop asking what AI can generate and redesign the work instead",
+        "Marketing measurement: how to build a system that connects activity to business outcomes"
+      ],
+      "title": "How to optimise content for AI search without writing generic SEO pages",
+      "url": "https://siddharthbhattacharjee.in/blog/how-to-optimise-content-for-ai-search",
+      "search_intent": "Informational and commercial investigation: how to optimise a consulting website for AI search, citations and generative search visibility without relying on unsupported GEO hacks.",
+      "topic_cluster": "SEO / AEO / GEO / AI Search",
+      "commit_sha": "",
+      "indexnow_result": "not_attempted",
+      "error": "Production content update was blocked by the repository write constraint described in reason.",
+      "next_action": "On the next content-engine run, safely apply the refresh to the existing URL, replacing the stale 1.5 billion monthly AI Overview usage claim with Google's current 2.5 billion monthly figure, adding Google's 2026 guidance that no special AEO/GEO markup is required, adding the globally available Search Console generative AI performance report, and strengthening the practical measurement and internal-link path."
     }
   ]
 }
