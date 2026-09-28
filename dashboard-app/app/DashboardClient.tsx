@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Search, Sparkles, Target, TrendingUp, Users, MousePointerClick, Download, CalendarCheck, Clock3, Globe2, Smartphone, UserRoundCheck } from 'lucide-react';
 import './dashboard.css';
+import { normalizeDashboard } from './normalize-dashboard';
 
 type FunnelItem = { label: string; value: number | null; rate?: number | null };
 type Snapshot = {
@@ -31,27 +32,52 @@ type DashboardData = {
  opportunities:{title:string;detail:string;type?:string}[]; goals:{label:string;target:string;cluster:string}[];
  periods?:Record<string, Snapshot>;
 };
-function n(v:number|null,s=''){return v===null?'Awaiting data':`${v.toLocaleString()}${s}`;}
-function p(v:number|null){return v===null?'Awaiting data':`${v.toFixed(1)}%`;}
-function pos(v:number|null){return v===null?'Awaiting data':v.toFixed(1);}
+function n(v:number|null,s=''){return typeof v!=='number'||!Number.isFinite(v)?'Awaiting data':`${v.toLocaleString()}${s}`;}
+function p(v:number|null){return typeof v!=='number'||!Number.isFinite(v)?'Awaiting data':`${v.toFixed(1)}%`;}
+function pos(v:number|null){return typeof v!=='number'||!Number.isFinite(v)?'Awaiting data':v.toFixed(1);}
 function Funnel({items}:{items:FunnelItem[]}){return <div className="funnel">{items.map((x,i)=><div className="funnel-step" key={x.label}><div className="funnel-bar" style={{width:`${Math.max(12,100-i*13)}%`}}><span>{x.label}</span><strong>{n(x.value)}</strong></div>{x.rate!==undefined&&x.rate!==null&&<small>{x.rate.toFixed(1)}% of previous stage</small>}</div>)}</div>}
 
 const ranges=[['7d','Last 7 days'],['28d','Last 28 days'],['90d','Last 90 days'],['month','This month'],['prev-month','Previous month'],['baseline','Since baseline']];
 
 export default function DashboardClient({ initialData }: { initialData: DashboardData }){
  const [d,setD]=useState<DashboardData>(initialData);
- useEffect(()=>{
-  fetch('/data/search-dashboard.json',{cache:'no-store'})
-   .then(r=>r.ok?r.json():Promise.reject(new Error('Dashboard data fetch failed')))
-   .then(next=>setD(next as DashboardData))
-   .catch(e=>console.error(e));
- },[]);
+ const [refreshing,setRefreshing]=useState(false);
+ const [refreshMessage,setRefreshMessage]=useState('');
+ const request=useRef<AbortController|null>(null);
  const [range,setRange]=useState('28d');
+ const [selectedRange,setSelectedRange]=useState('28d');
+ const refresh=useCallback(async()=>{
+  request.current?.abort();
+  const controller=new AbortController();
+  request.current=controller;
+  setRefreshing(true);
+  setRefreshMessage('');
+  const timeout=setTimeout(()=>controller.abort(),15000);
+  try{
+   const response=await fetch(`/data/search-dashboard.json?t=${Date.now()}`,{cache:'no-store',signal:controller.signal});
+   if(!response.ok) throw new Error('Unable to retrieve dashboard data.');
+   const next=normalizeDashboard(await response.json(),initialData) as DashboardData;
+   if(request.current!==controller) return;
+   setD(next);
+   setRefreshMessage(`Latest published data loaded. Checked at ${new Date().toLocaleTimeString('en-IN')}.`);
+  }catch{
+   if(request.current===controller) setRefreshMessage('Could not refresh. Your previous data is still shown. Please try again.');
+  }finally{
+   clearTimeout(timeout);
+   if(request.current===controller) setRefreshing(false);
+  }
+ },[initialData]);
+ useEffect(()=>{
+  const saved=new URLSearchParams(window.location.search).get('range');
+  if(saved&&ranges.some(([key])=>key===saved)){setRange(saved);setSelectedRange(saved);}
+  void refresh();
+  return ()=>{request.current?.abort();request.current=null;};
+ },[refresh]);
  const snapshot=d.periods?.[range];
  const view=snapshot?{...d,
   current:{...d.current,period:snapshot.period,clicks:snapshot.clicks,impressions:snapshot.impressions,ctr:snapshot.ctr,position:snapshot.position,nonBrandedClicks:snapshot.nonBrandedClicks,nonBrandedImpressions:snapshot.nonBrandedImpressions,aiFeatureImpressions:snapshot.aiFeatureImpressions,aiCitations:snapshot.aiCitations,citedPages:snapshot.citedPages},
-  change:{...d.change,clicks:snapshot.clicks,impressions:snapshot.impressions,ctr:snapshot.ctr,position:snapshot.position},
-  funnel:{...d.funnel,period:snapshot.period,users:snapshot.users,newUsers:snapshot.newUsers,returningUsers:snapshot.returningUsers,sessions:snapshot.sessions,engagedSessions:snapshot.engagedSessions,engagementRate:snapshot.engagementRate,organicSessions:snapshot.organicSessions,aiSessions:snapshot.aiSessions,resourceViews:snapshot.resourceViews,resourceDownloads:snapshot.resourceDownloads,resourceLeads:snapshot.resourceLeads,consultingEnquiries:snapshot.consultingEnquiries,bookingStarts:snapshot.bookingStarts,bookingCompletions:snapshot.bookingCompletions,bookClicks:snapshot.bookClicks,conversionRate:snapshot.conversionRate,topSources:snapshot.topSources??d.funnel.topSources,topLandingPages:(snapshot.topLandingPages??[]).map(x=>({path:x.page,sessions:x.sessions,engagementRate:x.engagementRate})),devices:(snapshot.devices??[]).map(x=>({device:x.device,users:x.users,share:x.share})),countries:(snapshot.countries??[]).map(x=>({country:x.country,users:x.users,share:x.share}))},
+  change:{clicks:null,impressions:null,ctr:null,position:null},
+  funnel:{...d.funnel,period:snapshot.period,users:snapshot.users,newUsers:snapshot.newUsers,returningUsers:snapshot.returningUsers,sessions:snapshot.sessions,engagedSessions:snapshot.engagedSessions,engagementRate:snapshot.engagementRate,organicSessions:snapshot.organicSessions,aiSessions:snapshot.aiSessions,resourceViews:snapshot.resourceViews,resourceDownloads:snapshot.resourceDownloads,resourceLeads:snapshot.resourceLeads,consultingEnquiries:snapshot.consultingEnquiries,bookingStarts:snapshot.bookingStarts,bookingCompletions:snapshot.bookingCompletions,bookClicks:snapshot.bookClicks,conversionRate:snapshot.conversionRate,topSources:snapshot.topSources??[],topLandingPages:(snapshot.topLandingPages??[]).map(x=>({path:x.page,sessions:x.sessions,engagementRate:x.engagementRate})),devices:(snapshot.devices??[]).map(x=>({device:x.device,users:x.users,share:x.share})),countries:(snapshot.countries??[]).map(x=>({country:x.country,users:x.users,share:x.share}))},
   queries:snapshot.queries??d.queries,
   pages:(snapshot.pages??[]).map(x=>({path:x.page,clicks:x.clicks,impressions:x.impressions,position:x.position,change:x.change})),
   ai:{...d.ai}
@@ -59,8 +85,8 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
  const rangeLabel=ranges.find(x=>x[0]===range)?.[1]||'Last 28 days';
  const fresh=d.updatedAt?new Date(d.updatedAt).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'Not synced yet';
  const c=[
-  {label:'Organic clicks',value:n(view.current.clicks),change:view.change.clicks===null?'Awaiting data':`${view.change.clicks>0?'+':''}${view.change.clicks.toFixed(1)}%`,icon:Search},
-  {label:'Search impressions',value:n(view.current.impressions),change:view.change.impressions===null?'Awaiting data':`${view.change.impressions>0?'+':''}${view.change.impressions.toFixed(1)}%`,icon:TrendingUp},
+  {label:'Organic clicks',value:n(view.current.clicks),change:view.change.clicks==null?'Comparison unavailable':`${view.change.clicks>0?'+':''}${view.change.clicks.toFixed(1)}%`,icon:Search},
+  {label:'Search impressions',value:n(view.current.impressions),change:view.change.impressions==null?'Comparison unavailable':`${view.change.impressions>0?'+':''}${view.change.impressions.toFixed(1)}%`,icon:TrendingUp},
   {label:'People / users',value:n(view.funnel.users),change:view.funnel.newUsers===null?'Awaiting data':`${n(view.funnel.newUsers)} new`,icon:Users},
   {label:'AI citations',value:n(view.current.aiCitations),change:view.current.citedPages===null?'Awaiting data':`${n(view.current.citedPages)} cited pages`,icon:Sparkles},
  ];
@@ -68,11 +94,12 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
  return <main className="dashboard-page"><div className="dashboard-shell">
   <header className="dashboard-header"><div><div className="dashboard-kicker">Private growth intelligence</div><h1>How people find you, what they do, and where the funnel leaks.</h1><p>SEO, AEO, GEO and the measurable journey from discovery to resource lead or consulting enquiry.</p></div><div className="dashboard-status"><span className={d.status==='awaiting-first-sync'?'status-dot pending':'status-dot'}/><span>Last sync: {fresh}</span></div></header>
 
-  <section className="dashboard-toolbar"><div><div className="toolbar-label">REPORTING PERIOD</div><strong>{rangeLabel}</strong><span>{hasRanges?'Live date-range snapshots are available.':'Date-range snapshots will activate after the first scheduled analytics sync.'}</span></div><form method="get" className="range-form"><label htmlFor="range">Date range</label><select id="range" name="range" defaultValue={range}>{ranges.map(([value,label])=><option value={value} key={value}>{label}</option>)}</select><button type="submit">Apply</button></form><a className="campaign-nav" href="/dashboard/campaigns">Campaign link builder →</a></section>
+  <section className="dashboard-toolbar"><div><div className="toolbar-label">REPORTING PERIOD</div><strong>{rangeLabel}</strong><span>{hasRanges?'Saved reporting snapshots are available.':'Date-range snapshots will activate after the first scheduled analytics sync.'}</span></div><form className="range-form" onSubmit={event=>{event.preventDefault();setRange(selectedRange);const url=new URL(window.location.href);url.searchParams.set('range',selectedRange);window.history.replaceState(null,'',url);}}><label htmlFor="range">Date range</label><select id="range" name="range" value={selectedRange} onChange={event=>setSelectedRange(event.target.value)}>{ranges.map(([value,label])=><option value={value} key={value}>{label}</option>)}</select><button type="submit">Apply</button><button type="button" onClick={()=>void refresh()} disabled={refreshing}>{refreshing?'Refreshing…':'Refresh'}</button></form><a className="campaign-nav" href="https://www.siddharthbhattacharjee.in/dashboard/campaigns">Campaign link builder →</a></section>
 
+  <div className="range-notice" role="status" aria-live="polite">{refreshMessage||'Loading dashboard data…'} Refresh retrieves the latest published snapshot. Source reporting dates are shown below.</div>
   <section className="dashboard-cards">{c.map(x=>{const I=x.icon;return <article className="dashboard-card" key={x.label}><div className="card-icon"><I size={18}/></div><div className="card-label">{x.label}</div><div className="card-value">{x.value}</div><div className="card-change">{x.change}</div></article>})}</section>
 
-  {!snapshot&&<div className="range-notice"><Clock3 size={15}/><span>Showing the current dashboard values until the daily sync has stored the selected date-range snapshot. The filter is ready and will become data-driven automatically.</span></div>}
+  {!snapshot&&<div className="range-notice"><Clock3 size={15}/><span>No snapshot is available for this date range. Showing the latest available reporting period.</span></div>}
 
   <section className="dashboard-panel funnel-panel"><div className="panel-head"><div><div className="panel-kicker">FULL FUNNEL</div><h2>From discovery to commercial intent</h2></div><span>{view.funnel.period||rangeLabel}</span></div>
    <Funnel items={[
@@ -99,13 +126,13 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
 
    <article className="dashboard-panel"><div className="panel-kicker">ENGAGEMENT</div><h2>Audience behaviour</h2><div className="behaviour-grid"><div><Clock3 size={16}/><span>Engaged sessions</span><strong>{n(view.funnel.engagedSessions)}</strong></div><div><UserRoundCheck size={16}/><span>New users</span><strong>{n(view.funnel.newUsers)}</strong></div><div><Users size={16}/><span>Returning</span><strong>{n(view.funnel.returningUsers)}</strong></div><div><TrendingUp size={16}/><span>Engagement rate</span><strong>{p(view.funnel.engagementRate)}</strong></div></div></article>
 
-   <article className="dashboard-panel"><div className="panel-kicker">SEO</div><h2>Search performance</h2><div className="mini-metrics"><div><span>Non-branded clicks</span><strong>{n(view.current.nonBrandedClicks)}</strong></div><div><span>Non-branded impressions</span><strong>{n(view.current.nonBrandedImpressions)}</strong></div><div><span>CTR</span><strong>{view.current.ctr===null?'Awaiting data':`${view.current.ctr.toFixed(2)}%`}</strong></div><div><span>Position</span><strong>{pos(view.current.position)}</strong></div></div></article>
+   <article className="dashboard-panel"><div className="panel-kicker">SEO</div><h2>Search performance</h2><div className="mini-metrics"><div><span>Non-branded clicks</span><strong>{n(view.current.nonBrandedClicks)}</strong></div><div><span>Non-branded impressions</span><strong>{n(view.current.nonBrandedImpressions)}</strong></div><div><span>CTR</span><strong>{view.current.ctr==null?'Awaiting data':`${view.current.ctr.toFixed(2)}%`}</strong></div><div><span>Position</span><strong>{pos(view.current.position)}</strong></div></div></article>
 
    <article className="dashboard-panel"><div className="panel-kicker">AEO / GEO</div><h2>AI visibility</h2><div className="ai-stat"><strong>{n(view.current.aiCitations)}</strong><span>AI citations</span></div><div className="ai-stat"><strong>{n(view.current.citedPages)}</strong><span>Cited pages</span></div><div className="ai-stat"><strong>{n(view.funnel.aiSessions)}</strong><span>AI-referred sessions</span></div><p className="panel-note">{view.ai.notes||'AI-search signals will appear when source data is available.'}</p></article>
 
    <article className="dashboard-panel"><div className="panel-kicker">SEARCH DEMAND</div><h2>Queries to watch</h2><div className="rank-list">{view.queries.length?view.queries.slice(0,8).map(q=><div className="rank-row" key={q.query}><div><strong>{q.query}</strong><span>{n(q.impressions)} impressions · {n(q.clicks)} clicks</span></div><b>{pos(q.position)}</b></div>):<div className="empty">The first sync will populate search queries.</div>}</div></article>
 
-   <article className="dashboard-panel wide"><div className="panel-head"><div><div className="panel-kicker">CONTENT</div><h2>Pages creating search equity</h2></div><a href="/blog">Writing <ArrowUpRight size={15}/></a></div><div className="rank-list">{view.pages.length?view.pages.slice(0,10).map(x=><div className="rank-row" key={x.path}><div><strong>{x.path}</strong><span>{n(x.clicks)} clicks · {n(x.impressions)} impressions</span></div><b>{pos(x.position)}</b></div>):<div className="empty">Page data will appear after the first sync.</div>}</div></article>
+   <article className="dashboard-panel wide"><div className="panel-head"><div><div className="panel-kicker">CONTENT</div><h2>Pages creating search equity</h2></div><a href="https://www.siddharthbhattacharjee.in/blog">Writing <ArrowUpRight size={15}/></a></div><div className="rank-list">{view.pages.length?view.pages.slice(0,10).map(x=><div className="rank-row" key={x.path}><div><strong>{x.path}</strong><span>{n(x.clicks)} clicks · {n(x.impressions)} impressions</span></div><b>{pos(x.position)}</b></div>):<div className="empty">Page data will appear after the first sync.</div>}</div></article>
 
    <article className="dashboard-panel wide"><div className="panel-head"><div><div className="panel-kicker">AI SEARCH</div><h2>Grounding queries and cited pages</h2></div></div><div className="ai-columns"><div><div className="subhead">Grounding queries</div><div className="rank-list">{view.ai.groundingQueries.length?view.ai.groundingQueries.slice(0,6).map(q=><div className="rank-row" key={q.query}><div><strong>{q.query}</strong></div><b>{q.citations??'?'}</b></div>):<div className="empty">AI grounding-query data will appear when available.</div>}</div></div><div><div className="subhead">Cited pages</div><div className="rank-list">{view.ai.citedPages.length?view.ai.citedPages.slice(0,6).map(q=><div className="rank-row" key={q.path}><div><strong>{q.path}</strong></div><b>{q.citations??'?'}</b></div>):<div className="empty">AI cited-page data will appear when available.</div>}</div></div></div></article>
 
@@ -113,6 +140,6 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
 
    <article className="dashboard-panel"><div className="panel-kicker">TARGETS</div><h2>90-day operating goals</h2><div className="goal-list">{d.goals.map(g=><div className="goal" key={g.label}><span>{g.cluster}</span><strong>{g.label}</strong><p>{g.target}</p></div>)}</div></article>
   </section>
-  <footer className="dashboard-footer"><span>Private, noindex, no-cache. Dashboard traffic is excluded from site analytics.</span><a href="/">Back to site</a></footer>
+  <footer className="dashboard-footer"><span>Private, noindex, no-cache. Dashboard traffic is excluded from site analytics.</span><a href="https://www.siddharthbhattacharjee.in/">Back to site</a></footer>
  </div></main>;
 }

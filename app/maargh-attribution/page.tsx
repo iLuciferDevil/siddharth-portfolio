@@ -5,7 +5,8 @@ import { useEffect, useMemo, useState } from 'react';
 const PEOPLE = ['Sidd', 'Sagar', 'Tony', 'Sameer', 'Samyuktha', 'Satarupa'];
 const INSTAGRAM = 'https://www.instagram.com/maargh.in/';
 
-type ContentItem = { id: number; type: string; label: string; url: string; likes:number; comments:number; shares:number; saves:number; reach:number };\ntype PersonMetric = { clicks:number; follows:number };
+type ContentItem = { id: number; type: string; label: string; url: string; likes:number; comments:number; shares:number; saves:number; reach:number };
+type PersonMetric = { clicks:number; follows:number };
 
 export default function MaarghAttribution() {
   const [campaign, setCampaign] = useState('follower_growth');
@@ -18,7 +19,14 @@ export default function MaarghAttribution() {
   const [contentLabel, setContentLabel] = useState('');
   const [contentUrl, setContentUrl] = useState('');
   const [items, setItems] = useState<ContentItem[]>([]);
-  const [itemId, setItemId] = useState(1);\n  const [metrics, setMetrics] = useState<Record<string, PersonMetric>>({});\n\n  useEffect(() => { try { const s=JSON.parse(localStorage.getItem('maargh-attribution-v2')||'null'); if(s){ setCampaign(s.campaign||'follower_growth'); setMedium(s.medium||'referral'); setContent(s.content||'share'); setFollowersStart(s.followersStart||''); setFollowersNow(s.followersNow||''); setItems(s.items||[]); setMetrics(s.metrics||{}); setItemId(s.itemId||1); } } catch {} }, []);\n  useEffect(() => { localStorage.setItem('maargh-attribution-v2', JSON.stringify({campaign,medium,content,followersStart,followersNow,items,metrics,itemId})); }, [campaign,medium,content,followersStart,followersNow,items,metrics,itemId]);\n\n  const getMetric = (person:string) => metrics[person] || {clicks:0,follows:0};\n  const updateMetric = (person:string,key:'clicks'|'follows',value:string) => setMetrics(prev=>({...prev,[person]:{...getMetric(person),[key]:Math.max(0,Number(value)||0)}}));
+  const [itemId, setItemId] = useState(1);
+  const [metrics, setMetrics] = useState<Record<string, PersonMetric>>({});
+
+  useEffect(() => { try { const s=JSON.parse(localStorage.getItem('maargh-attribution-v2')||'null'); if(s){ setCampaign(s.campaign||'follower_growth'); setMedium(s.medium||'referral'); setContent(s.content||'share'); setFollowersStart(s.followersStart||''); setFollowersNow(s.followersNow||''); setItems(s.items||[]); setMetrics(s.metrics||{}); setItemId(s.itemId||1); } } catch {} }, []);
+  useEffect(() => { localStorage.setItem('maargh-attribution-v2', JSON.stringify({campaign,medium,content,followersStart,followersNow,items,metrics,itemId})); }, [campaign,medium,content,followersStart,followersNow,items,metrics,itemId]);
+
+  const getMetric = (person:string) => metrics[person] || {clicks:0,follows:0};
+  const updateMetric = (person:string,key:'clicks'|'follows',value:string) => setMetrics(prev=>({...prev,[person]:{...getMetric(person),[key]:Math.max(0,Number(value)||0)}}));
 
   const profileLinks = useMemo(() => PEOPLE.map(person => ({
     person, url: buildTrackedUrl(INSTAGRAM, person, medium, campaign, content)
@@ -38,7 +46,10 @@ export default function MaarghAttribution() {
     } catch { setContentUrl(raw); }
   };
 
-  const removeContent = (id: number) => setItems(prev => prev.filter(item => item.id !== id));\n  const updateContent = (id:number,key:'likes'|'comments'|'shares'|'saves'|'reach',value:string) => setItems(prev=>prev.map(x=>x.id===id?{...x,[key]:Math.max(0,Number(value)||0)}:x));\n  const totalClicks=PEOPLE.reduce((s,p)=>s+getMetric(p).clicks,0), totalFollows=PEOPLE.reduce((s,p)=>s+getMetric(p).follows,0);\n  const totalLikes=items.reduce((s,x)=>s+x.likes,0), totalComments=items.reduce((s,x)=>s+x.comments,0), totalShares=items.reduce((s,x)=>s+x.shares,0), totalSaves=items.reduce((s,x)=>s+x.saves,0);
+  const removeContent = (id: number) => setItems(prev => prev.filter(item => item.id !== id));
+  const updateContent = (id:number,key:'likes'|'comments'|'shares'|'saves'|'reach',value:string) => setItems(prev=>prev.map(x=>x.id===id?{...x,[key]:Math.max(0,Number(value)||0)}:x));
+  const totalClicks=PEOPLE.reduce((s,p)=>s+getMetric(p).clicks,0), totalFollows=PEOPLE.reduce((s,p)=>s+getMetric(p).follows,0);
+  const totalLikes=items.reduce((s,x)=>s+x.likes,0), totalComments=items.reduce((s,x)=>s+x.comments,0), totalShares=items.reduce((s,x)=>s+x.shares,0), totalSaves=items.reduce((s,x)=>s+x.saves,0);
 
   async function copy(key: string, url: string) {
     await navigator.clipboard.writeText(url);
@@ -83,7 +94,9 @@ export default function MaarghAttribution() {
           </div></section>
         </div>
 
-        <section className="ma-card"><h2>Person-level attribution</h2><p className="ma-muted">Enter measured clicks and attributed follows for each person's tracked link.</p><div className="ma-scroll"><table className="ma-table"><thead><tr><th>Person</th><th>Clicks</th><th>Followed</th><th>Follow rate</th></tr></thead><tbody>{PEOPLE.map(p=>{const m=getMetric(p);const rate=m.clicks?m.follows/m.clicks*100:0;return <tr key={p}><td><b>{p}</b></td><td><input className="mini" inputMode="numeric" value={m.clicks||''} onChange={e=>updateMetric(p,'clicks',e.target.value)} placeholder="0"/></td><td><input className="mini" inputMode="numeric" value={m.follows||''} onChange={e=>updateMetric(p,'follows',e.target.value)} placeholder="0"/></td><td><b>{rate.toFixed(1)}%</b></td></tr>})}</tbody></table></div></section>\n\n        <section className="ma-card"><h2>Add a post / Reel / other link</h2><p className="ma-muted">Paste the original Instagram post or Reel URL. You only need to add it once.</p>
+        <section className="ma-card"><h2>Person-level attribution</h2><p className="ma-muted">Enter measured clicks and attributed follows for each person's tracked link.</p><div className="ma-scroll"><table className="ma-table"><thead><tr><th>Person</th><th>Clicks</th><th>Followed</th><th>Follow rate</th></tr></thead><tbody>{PEOPLE.map(p=>{const m=getMetric(p);const rate=m.clicks?m.follows/m.clicks*100:0;return <tr key={p}><td><b>{p}</b></td><td><input className="mini" inputMode="numeric" value={m.clicks||''} onChange={e=>updateMetric(p,'clicks',e.target.value)} placeholder="0"/></td><td><input className="mini" inputMode="numeric" value={m.follows||''} onChange={e=>updateMetric(p,'follows',e.target.value)} placeholder="0"/></td><td><b>{rate.toFixed(1)}%</b></td></tr>})}</tbody></table></div></section>
+
+        <section className="ma-card"><h2>Add a post / Reel / other link</h2><p className="ma-muted">Paste the original Instagram post or Reel URL. You only need to add it once.</p>
           <div className="ma-content-form">
             <div className="ma-field"><label>Type</label><select value={contentType} onChange={e=>setContentType(e.target.value)}><option value="reel">Reel</option><option value="post">Post</option><option value="story">Story</option><option value="video">Video</option><option value="other">Other</option></select></div>
             <div className="ma-field"><label>Label</label><input value={contentLabel} onChange={e=>setContentLabel(e.target.value)} placeholder="e.g. Founder story Reel"/></div>
@@ -95,7 +108,9 @@ export default function MaarghAttribution() {
           </tbody></table></div><div className="ma-note">Changing campaign or medium updates all generated links. Each content item uses its label as <b>utm_content</b>, while <b>utm_source</b> remains the individual person's name.</div></div>}
         </section>
 
-        {items.length > 0 && <section className="ma-card"><h2>Content performance</h2><p className="ma-muted">Enter the figures from Instagram Insights for each post/Reel.</p><div className="ma-scroll"><table className="ma-table"><thead><tr><th>Content</th><th>Likes</th><th>Comments</th><th>Shares</th><th>Saves</th><th>Reach</th><th></th></tr></thead><tbody>{items.map(item=><tr key={item.id}><td><b>{item.label}</b><br/><span className="ma-muted">{item.type}</span></td>{(['likes','comments','shares','saves','reach'] as const).map(k=><td key={k}><input className="mini" inputMode="numeric" value={item[k]||''} onChange={e=>updateContent(item.id,k,e.target.value)} placeholder="0"/></td>)}<td><button className="ma-btn" onClick={()=>removeContent(item.id)}>Remove</button></td></tr>)}</tbody></table></div></section>}\n\n        <section className="ma-card"><h2>Profile tracking links</h2><div className="ma-scroll"><table className="ma-table"><thead><tr><th>Person</th><th>Tracked profile URL</th><th></th></tr></thead><tbody>
+        {items.length > 0 && <section className="ma-card"><h2>Content performance</h2><p className="ma-muted">Enter the figures from Instagram Insights for each post/Reel.</p><div className="ma-scroll"><table className="ma-table"><thead><tr><th>Content</th><th>Likes</th><th>Comments</th><th>Shares</th><th>Saves</th><th>Reach</th><th></th></tr></thead><tbody>{items.map(item=><tr key={item.id}><td><b>{item.label}</b><br/><span className="ma-muted">{item.type}</span></td>{(['likes','comments','shares','saves','reach'] as const).map(k=><td key={k}><input className="mini" inputMode="numeric" value={item[k]||''} onChange={e=>updateContent(item.id,k,e.target.value)} placeholder="0"/></td>)}<td><button className="ma-btn" onClick={()=>removeContent(item.id)}>Remove</button></td></tr>)}</tbody></table></div></section>}
+
+        <section className="ma-card"><h2>Profile tracking links</h2><div className="ma-scroll"><table className="ma-table"><thead><tr><th>Person</th><th>Tracked profile URL</th><th></th></tr></thead><tbody>
           {profileLinks.map(({person,url})=><tr key={person}><td><b>{person}</b></td><td className="ma-url">{url}</td><td><button className="ma-btn" onClick={()=>copy(`profile-${person}`,url)}>{copied===`profile-${person}`?'Copied':'Copy link'}</button></td></tr>)}
         </tbody></table></div><div className="ma-note"><b>Attribution note:</b> Instagram engagement belongs to the content, not to the UTM source. “Followed” is the number you attribute to each person's tracked link from your available analytics. Likes, comments, shares, saves and reach are recorded at content level.</div></section>
       </div>
