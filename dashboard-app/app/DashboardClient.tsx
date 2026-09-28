@@ -41,6 +41,9 @@ const ranges=[['7d','Last 7 days'],['28d','Last 28 days'],['90d','Last 90 days']
 
 export default function DashboardClient({ initialData }: { initialData: DashboardData }){
  const [d,setD]=useState<DashboardData>(initialData);
+ const rawData=useRef<any>(null);
+ const [syncing,setSyncing]=useState(false);
+ const [syncMessage,setSyncMessage]=useState('');
  const [refreshing,setRefreshing]=useState(false);
  const [refreshMessage,setRefreshMessage]=useState('');
  const request=useRef<AbortController|null>(null);
@@ -56,7 +59,17 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
   try{
    const response=await fetch(`/data/search-dashboard.json?t=${Date.now()}`,{cache:'no-store',signal:controller.signal});
    if(!response.ok) throw new Error('Unable to retrieve dashboard data.');
-   const next=normalizeDashboard(await response.json(),initialData) as DashboardData;
+   let raw=await response.json();
+   try{
+    const saved=JSON.parse(localStorage.getItem('portfolio-live-snapshots-v1')||'null');
+    if(saved?.site===raw.site){
+     for(const [key,value] of Object.entries(saved.periods||{}) as [string,any][]){
+      if(value?.syncedAt && (!raw.periods?.[key]?.syncedAt || value.syncedAt>raw.periods[key].syncedAt)) raw={...raw,periods:{...raw.periods,[key]:value}};
+     }
+    }
+   }catch{}
+   const next=normalizeDashboard(raw,initialData) as DashboardData;
+   rawData.current=raw;
    if(request.current!==controller) return;
    setD(next);
    setRefreshMessage(`Latest published data loaded. Checked at ${new Date().toLocaleTimeString('en-IN')}.`);
@@ -73,6 +86,23 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
   void refresh();
   return ()=>{request.current?.abort();request.current=null;};
  },[refresh]);
+ async function syncNow(){
+  if(syncing||refreshing) return;
+  setSyncing(true);setSyncMessage('Connecting to Google Analytics and Search Console…');
+  try{
+   const response=await fetch('/api/sync/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({range}),cache:'no-store',signal:AbortSignal.timeout(55000)});
+   const result=await response.json();
+   if(!response.ok) throw new Error(result.message||'Sync could not complete. Your previous data has been kept.');
+   if(result.range!==range||!result.snapshot||!result.syncedAt||!rawData.current) throw new Error('Google returned an incomplete sync. Your previous data has been kept.');
+   const raw={...rawData.current,periods:{...rawData.current.periods,[range]:result.snapshot}};
+   const next=normalizeDashboard(raw,initialData) as DashboardData;
+   rawData.current=raw;setD(next);
+   let persisted=true;
+   try{localStorage.setItem('portfolio-live-snapshots-v1',JSON.stringify({site:raw.site,periods:raw.periods}));}catch{persisted=false;}
+   setSyncMessage(`${result.message} Reporting period: ${result.reportingPeriod}.${persisted?' Saved in this browser.':' This browser could not save the snapshot; keep this page open.'}`);
+  }catch(error){setSyncMessage(error instanceof Error?error.message:'Sync failed. Your previous data has been kept.');}
+  finally{setSyncing(false);}
+ }
  const snapshot=d.periods?.[range];
  const view=snapshot?{...d,
   current:{...d.current,period:snapshot.period,clicks:snapshot.clicks,impressions:snapshot.impressions,ctr:snapshot.ctr,position:snapshot.position,nonBrandedClicks:snapshot.nonBrandedClicks,nonBrandedImpressions:snapshot.nonBrandedImpressions,aiFeatureImpressions:snapshot.aiFeatureImpressions,aiCitations:snapshot.aiCitations,citedPages:snapshot.citedPages},
@@ -83,7 +113,8 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
   ai:{...d.ai}
 }:{...d};
  const rangeLabel=ranges.find(x=>x[0]===range)?.[1]||'Last 28 days';
- const fresh=d.updatedAt?new Date(d.updatedAt).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'Not synced yet';
+ const syncDate=(snapshot as any)?.syncedAt||d.updatedAt;
+ const fresh=syncDate?new Date(syncDate).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}):'Not synced yet';
  const c=[
   {label:'Organic clicks',value:n(view.current.clicks),change:view.change.clicks==null?'Comparison unavailable':`${view.change.clicks>0?'+':''}${view.change.clicks.toFixed(1)}%`,icon:Search},
   {label:'Search impressions',value:n(view.current.impressions),change:view.change.impressions==null?'Comparison unavailable':`${view.change.impressions>0?'+':''}${view.change.impressions.toFixed(1)}%`,icon:TrendingUp},
@@ -94,9 +125,10 @@ export default function DashboardClient({ initialData }: { initialData: Dashboar
  return <main className="dashboard-page"><div className="dashboard-shell">
   <header className="dashboard-header"><div><div className="dashboard-kicker">Private growth intelligence</div><h1>How people find you, what they do, and where the funnel leaks.</h1><p>SEO, AEO, GEO and the measurable journey from discovery to resource lead or consulting enquiry.</p></div><div className="dashboard-status"><span className={d.status==='awaiting-first-sync'?'status-dot pending':'status-dot'}/><span>Last sync: {fresh}</span></div></header>
 
-  <section className="dashboard-toolbar"><div><div className="toolbar-label">REPORTING PERIOD</div><strong>{rangeLabel}</strong><span>{hasRanges?'Saved reporting snapshots are available.':'Date-range snapshots will activate after the first scheduled analytics sync.'}</span></div><form className="range-form" onSubmit={event=>{event.preventDefault();setRange(selectedRange);const url=new URL(window.location.href);url.searchParams.set('range',selectedRange);window.history.replaceState(null,'',url);}}><label htmlFor="range">Date range</label><select id="range" name="range" value={selectedRange} onChange={event=>setSelectedRange(event.target.value)}>{ranges.map(([value,label])=><option value={value} key={value}>{label}</option>)}</select><button type="submit">Apply</button><button type="button" onClick={()=>void refresh()} disabled={refreshing}>{refreshing?'Refreshing…':'Refresh'}</button></form><a className="campaign-nav" href="https://www.siddharthbhattacharjee.in/dashboard/campaigns">Campaign link builder →</a></section>
+  <section className="dashboard-toolbar"><div><div className="toolbar-label">REPORTING PERIOD</div><strong>{rangeLabel}</strong><span>{hasRanges?'Saved reporting snapshots are available.':'Date-range snapshots will activate after the first scheduled analytics sync.'}</span></div><form className="range-form" onSubmit={event=>{event.preventDefault();setRange(selectedRange);const url=new URL(window.location.href);url.searchParams.set('range',selectedRange);window.history.replaceState(null,'',url);}}><label htmlFor="range">Date range</label><select id="range" name="range" value={selectedRange} onChange={event=>setSelectedRange(event.target.value)}>{ranges.map(([value,label])=><option value={value} key={value}>{label}</option>)}</select><button type="submit" disabled={syncing}>Apply</button><button type="button" onClick={()=>void refresh()} disabled={refreshing||syncing}>{refreshing?'Refreshing…':'Refresh'}</button><button type="button" onClick={()=>void syncNow()} disabled={syncing||refreshing}>{syncing?'Syncing…':'Sync Now'}</button></form><a className="campaign-nav" href="https://www.siddharthbhattacharjee.in/dashboard/campaigns">Campaign link builder →</a></section>
 
-  <div className="range-notice" role="status" aria-live="polite">{refreshMessage||'Loading dashboard data…'} Refresh retrieves the latest published snapshot. Source reporting dates are shown below.</div>
+  <div className="range-notice" role="status" aria-live="polite">{refreshMessage||'Loading dashboard data…'} Refresh reloads saved data. Sync Now requests Google data for the applied date range. Recent dates may still be processing.</div>
+  {syncMessage&&<div className="range-notice" role="status" aria-live="polite">{syncMessage}</div>}
   <section className="dashboard-cards">{c.map(x=>{const I=x.icon;return <article className="dashboard-card" key={x.label}><div className="card-icon"><I size={18}/></div><div className="card-label">{x.label}</div><div className="card-value">{x.value}</div><div className="card-change">{x.change}</div></article>})}</section>
 
   {!snapshot&&<div className="range-notice"><Clock3 size={15}/><span>No snapshot is available for this date range. Showing the latest available reporting period.</span></div>}
