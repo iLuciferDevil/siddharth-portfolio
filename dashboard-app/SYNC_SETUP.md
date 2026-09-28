@@ -9,7 +9,7 @@ Set these variables in the **siddharth-portfolio-sr9f** Vercel project, Producti
 - `GA4_PROPERTY_ID`: the numeric GA4 property ID for siddharthbhattacharjee.in (not the G- measurement ID).
 - `GOOGLE_SERVICE_ACCOUNT_JSON`: the complete service account JSON, stored as a sensitive environment variable. Never put it in GitHub, a NEXT_PUBLIC variable, or chat.
 
-Enable Google Analytics Data API and Google Search Console API in that service account's Google Cloud project. Give the account Viewer access to the portfolio GA4 property and read access to `sc-domain:siddharthbhattacharjee.in` in Search Console. No domain-wide delegation or write permissions are needed. Redeploy after setting the variables. Keep Vercel deployment access protection enabled for the dashboard and its API.
+Enable Google Analytics Data API and Google Search Console API in that service account's Google Cloud project. Give the account Viewer access to the portfolio GA4 property and restricted read access to the `https://siddharthbhattacharjee.in/` URL-prefix property in Search Console. No domain-wide delegation or write permissions are needed. Redeploy after setting the variables. Keep Vercel deployment access protection enabled for the dashboard and its API.
 
 ## Verification
 

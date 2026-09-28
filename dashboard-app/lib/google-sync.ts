@@ -1,6 +1,6 @@
 import { createSign } from 'node:crypto';
 
-export const SITE = 'sc-domain:siddharthbhattacharjee.in';
+export const SITE = 'https://siddharthbhattacharjee.in/';
 export const RANGE_KEYS = ['7d','28d','90d','month','prev-month','baseline'];
 type Row = Record<string, any>;
 export class SyncError extends Error {
